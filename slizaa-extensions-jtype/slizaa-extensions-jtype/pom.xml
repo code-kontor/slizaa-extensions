@@ -1,0 +1,104 @@
+<!--
+
+    slizaa-extensions-jtype - Slizaa Static Software Analysis Tools
+    Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.codekontor.slizaa.extensions</groupId>
+		<artifactId>slizaa-extensions-jtype-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>slizaa-extensions-jtype</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>io.codekontor.slizaa.extensions</groupId>
+			<artifactId>slizaa-extensions-jtype-scanner</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.codekontor.slizaa</groupId>
+					<artifactId>slizaa-scanner-spi-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.codekontor.slizaa.extensions</groupId>
+			<artifactId>slizaa-extensions-jtype-scanner-apoc</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.codekontor.slizaa</groupId>
+					<artifactId>slizaa-scanner-spi-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>io.codekontor.slizaa.extensions</groupId>
+			<artifactId>slizaa-extensions-jtype-hierarchicalgraph</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.codekontor.slizaa</groupId>
+					<artifactId>slizaa-scanner-spi-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>io.codekontor.slizaa.extensions</groupId>
+			<artifactId>slizaa-extensions-neo4j</artifactId>
+			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.codekontor.slizaa</groupId>
+					<artifactId>slizaa-scanner-spi-api</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>3.1.1</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

@@ -1,0 +1,57 @@
+<!--
+
+    slizaa-extensions-neo4j-parent - Slizaa Static Software Analysis Tools
+    Copyright © 2019 Code-Kontor GmbH and others (slizaa@codekontor.io)
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.codekontor.slizaa.extensions</groupId>
+		<artifactId>slizaa-extensions-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../slizaa-extensions-parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>slizaa-extensions-neo4j-parent</artifactId>
+
+	<packaging>pom</packaging>
+
+	<modules>
+		<module>slizaa-extensions-neo4j-bom</module>
+		<module>slizaa-extensions-neo4j-apoc</module>
+		<module>slizaa-extensions-neo4j-graphdbfactory</module>
+		<module>slizaa-extensions-neo4j-importer</module>
+		<module>slizaa-extensions-neo4j</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>io.codekontor.slizaa.extensions</groupId>
+				<artifactId>slizaa-extensions-neo4j-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+</project>

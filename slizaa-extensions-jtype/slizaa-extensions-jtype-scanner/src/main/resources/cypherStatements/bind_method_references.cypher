@@ -1,0 +1,8 @@
+/**
+ * @slizaa.groupId            io.codekontor.slizaa.jtype.core
+ * @slizaa.statementId        bindMethodReferences
+ * @slizaa.requiredStatements bindTypeReferences
+ */
+MATCH (mref:MethodReference) MATCH (m:Method) 
+WHERE mref.fqn = m.fqn AND NOT (mref)-[:BOUND_TO]->(m) 
+CREATE (mref)-[:BOUND_TO {derived:true}]->(m)

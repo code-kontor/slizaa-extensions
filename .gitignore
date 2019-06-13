@@ -1,5 +1,6 @@
 target/
 /.metadata/
-/.idea/workspace.xml
+/.idea
 /.project
 /.settings/
+*.iml

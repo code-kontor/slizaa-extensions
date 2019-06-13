@@ -23,7 +23,7 @@ package io.codekontor.slizaa.jtype.scanner;
 import java.io.File;
 import java.util.function.Consumer;
 
-import io.codekontor.slizaa.core.mvnresolver.api.IMvnResolverService.IMvnResolverJob;
+import io.codekontor.mvnresolver.api.IMvnResolverService.IMvnResolverJob;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.testfwk.SlizaaTestServerRule;
 

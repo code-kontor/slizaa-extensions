@@ -23,6 +23,7 @@ package io.codekontor.slizaa.jtype.hierarchicalgraph;
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
@@ -31,7 +32,6 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
 import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.HGNodeUtils;
-import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.JTypeSlizaaTestServerRule;
 
 /**
  * <p>
@@ -43,7 +43,7 @@ import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.JTypeSlizaaTestServerR
 public class ResolveAggregatedDependenciesTest {
 
   @ClassRule
-  public static JTypeSlizaaTestServerRule SERVER = new JTypeSlizaaTestServerRule(
+  public static JTypeTestServerRule SERVER = new JTypeTestServerRule(
       multipleBinaryMvnArtifacts(new String[] { "com.fasterxml.jackson.core", "jackson-annotations", "2.5.0" },
           new String[] { "com.fasterxml.jackson.core", "jackson-core", "2.5.1" },
           new String[] { "com.fasterxml.jackson.core", "jackson-databind", "2.5.1" },

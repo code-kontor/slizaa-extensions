@@ -10,19 +10,6 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.servicemix.tooling</groupId>
-        <artifactId>depends-maven-plugin</artifactId>
-        <version>1.4.0</version>
-        <executions>
-          <execution>
-            <id>generate-depends-file</id>
-            <goals>
-              <goal>generate-depends-file</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.1.0</version>
         <executions>
@@ -83,6 +70,17 @@
             <param>io.codekontor.slizaa.scanner.spi.parser.IParserFactory</param>
           </services>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>3.0.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -244,8 +242,8 @@
           <groupId>io.codekontor.slizaa</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>slizaa-core-mvnresolver-uber</artifactId>
-          <groupId>io.codekontor.slizaa</groupId>
+          <artifactId>mvnresolver-uber</artifactId>
+          <groupId>io.codekontor.mvnresolver</groupId>
         </exclusion>
         <exclusion>
           <artifactId>slizaa-scanner-contentdefinition</artifactId>

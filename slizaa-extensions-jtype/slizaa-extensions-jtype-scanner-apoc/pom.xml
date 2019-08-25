@@ -132,20 +132,6 @@
 	<build>
 		<plugins>
 
-			<plugin>
-				<groupId>org.apache.servicemix.tooling</groupId>
-				<artifactId>depends-maven-plugin</artifactId>
-				<version>1.4.0</version>
-				<executions>
-					<execution>
-						<id>generate-depends-file</id>
-						<goals>
-							<goal>generate-depends-file</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 			<!-- configure the maven bundle plugin -->
 			<plugin>
 				<groupId>biz.aQute.bnd</groupId>

@@ -25,6 +25,7 @@ import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFact
 
 import java.util.List;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Test;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
@@ -32,7 +33,6 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
-import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.JTypeSlizaaTestServerRule;
 
 /**
  * <p>
@@ -44,8 +44,8 @@ import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.JTypeSlizaaTestServerR
 public class JTypeNodeComparatorTest {
 
 	@ClassRule
-	public static JTypeSlizaaTestServerRule SERVER = new JTypeSlizaaTestServerRule(
-			multipleBinaryMvnArtifacts(new String[] { "com.google.guava", "guava", "23.6.1-jre" }));
+	public static JTypeTestServerRule SERVER = new JTypeTestServerRule(
+			multipleBinaryMvnArtifacts(new String[] { "com.google.guava", "guava", "21.0" }));
 
 	@ClassRule
 	public static BoltClientConnectionRule CLIENT = new BoltClientConnectionRule();

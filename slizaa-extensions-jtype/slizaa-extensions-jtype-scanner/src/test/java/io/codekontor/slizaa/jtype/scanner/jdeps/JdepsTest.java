@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +39,6 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.jtype.scanner.JTypeSlizaaTestServerRule;
 import io.codekontor.slizaa.jtype.scanner.jdeps.internal.JavapWrapper;
 
 @Ignore
@@ -46,7 +46,7 @@ import io.codekontor.slizaa.jtype.scanner.jdeps.internal.JavapWrapper;
 public class JdepsTest {
 
   @Rule
-  public JTypeSlizaaTestServerRule _slizaaTestServerRule = new JTypeSlizaaTestServerRule(
+  public JTypeTestServerRule _slizaaTestServerRule = new JTypeTestServerRule(
       simpleBinaryFile("dummy", "dummy", getJarFile()));
 
   @Rule

@@ -139,6 +139,25 @@ public class ParseJob implements Callable<List<IProblem>> {
     List<IProblem> problems = new LinkedList<IProblem>();
 
     try {
+
+      for (Directory directory : _directories) {
+
+        //
+        logger.debug("Parsing directory {}...", directory.getPath());
+
+        //
+//        if (checkIfCanceled(_progressMonitor)) {
+//          _canceled = true;
+//          return problems;
+//        }
+
+        //
+        if (!directory.getBinaryResources().isEmpty()) {
+          problems.addAll(parse(_content, _batchInserter.getOrCreateDirectoyNode(directory, _moduleNode),
+                  directory.getBinaryResources(), ResourceType.Binary, _parser, _progressMonitor));
+        }
+      }
+
       //
       for (final Directory directory : _directories) {
 
@@ -155,23 +174,7 @@ public class ParseJob implements Callable<List<IProblem>> {
         }
       }
 
-      for (Directory directory : _directories) {
 
-        //
-        logger.debug("Parsing directory {}...", directory.getPath());
-
-        //
-//        if (checkIfCanceled(_progressMonitor)) {
-//          _canceled = true;
-//          return problems;
-//        }
-
-        //
-        if (!directory.getBinaryResources().isEmpty()) {
-          problems.addAll(parse(_content, _batchInserter.getOrCreateDirectoyNode(directory, _moduleNode),
-              directory.getBinaryResources(), ResourceType.Binary, _parser, _progressMonitor));
-        }
-      }
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

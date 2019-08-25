@@ -20,17 +20,20 @@ package io.codekontor.slizaa.jtype.scanner.apoc;
 import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
+import org.neo4j.driver.v1.StatementResult;
 
 public class JTypeProceduresTest {
 
-  @ClassRule
-  public static JTypeSlizaaTestServerRule _server = new JTypeSlizaaTestServerRule(
-      multipleBinaryMvnArtifacts(new String[] { "com.netflix.eureka", "eureka-core", "1.8.2" },
-          new String[] { "com.netflix.eureka", "eureka-client", "1.8.2" }));
+    @ClassRule
+    public static JTypeTestServerRule _server = new JTypeTestServerRule(
+            multipleBinaryMvnArtifacts(new String[]{"com.netflix.eureka", "eureka-core", "1.8.2"},
+                    new String[]{"com.netflix.eureka", "eureka-client", "1.8.2"}));
+            //.withExtensionClass(JTypeProcedures.class);
 
     @Rule
     public BoltClientConnectionRule _client = new BoltClientConnectionRule();
@@ -42,8 +45,17 @@ public class JTypeProceduresTest {
     @Test
     public void testJtypeProcedures() {
 
-    //
-    // StatementResult statementResult = this._client.getBoltClient().syncExecCypherQuery("CALL slizaa.jtype.test()");
-    // statementResult.forEachRemaining(record -> System.out.println(record));
-  }
+
+        StatementResult statementResult = this._client.getBoltClient().syncExecCypherQuery("CALL slizaa.jtype.createMissingTypes()");
+
+        statementResult = this._client.getBoltClient().syncExecCypherQuery("Match(t:MissingType) return count(t) as count");
+        assertThat(statementResult.single().get("count").asInt()).isEqualTo(904);
+
+        statementResult = this._client.getBoltClient().syncExecCypherQuery("Match(t:MissingType) return t.name, t.fqn");
+        statementResult.forEachRemaining(r -> {
+                    assertThat(r.get("t.name").asString()).isNotEmpty();
+                    assertThat(r.get("t.fqn").asString()).isNotEmpty();
+                }
+        );
+    }
 }

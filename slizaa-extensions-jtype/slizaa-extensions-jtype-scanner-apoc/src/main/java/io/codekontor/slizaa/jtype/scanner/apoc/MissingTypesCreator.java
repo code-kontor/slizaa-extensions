@@ -42,17 +42,18 @@ import com.google.common.cache.LoadingCache;
  */
 public class MissingTypesCreator {
 
-  /** - */
-  private final Label                LABEL_MISSING_TYPE = Label.label("MissingType");
+  // the Label 'MissingType'
+  private final Label LABEL_MISSING_TYPE = Label.label("MissingType");
 
-  /** - */
-  private final Label                LABEL_PACKAGE      = Label.label("Package");
+  // the Label 'Package'
+  private final Label LABEL_PACKAGE = Label.label("Package");
 
-  private final Label                LABEL_DIRECTORY    = Label.label("Directory");
+  // the Label 'Directory'
+  private final Label LABEL_DIRECTORY = Label.label("Directory");
 
-  /** - */
-  private final RelationshipType     REL_CONTAINS       = RelationshipType
-      .withName(CoreModelRelationshipType.CONTAINS.name());
+  // the contains relationship
+  private final RelationshipType REL_CONTAINS = RelationshipType
+          .withName(CoreModelRelationshipType.CONTAINS.name());
 
   /** - */
   private GraphDatabaseService       _graphDatabaseService;
@@ -105,7 +106,6 @@ public class MissingTypesCreator {
    * <p>
    * </p>
    *
-   * @param packageName
    * @return
    */
   public Node getOrCreateVirtualType(String typeName) {
@@ -126,13 +126,17 @@ public class MissingTypesCreator {
 
     //
     int index = packageName.lastIndexOf('.');
+    String simplePackageName = packageName;
     if (index != -1) {
-      parentNode = MissingTypesCreator.this._virtualPackagesCache.getUnchecked(packageName.substring(0, index));
+      simplePackageName = packageName.substring(index + 1);
+      String parentPackageName = packageName.substring(0, index);
+      parentNode = MissingTypesCreator.this._virtualPackagesCache.getUnchecked(parentPackageName);
     }
 
     //
     Map<String, String> properties = new HashMap<>();
     properties.put("fqn", packageName);
+    properties.put("name", simplePackageName);
 
     Node packageNode = createNode(properties, this.LABEL_PACKAGE, this.LABEL_DIRECTORY);
     if (parentNode != null) {
@@ -158,13 +162,16 @@ public class MissingTypesCreator {
 
     //
     int index = typeName.lastIndexOf('.');
+    String simpleTypeName = typeName;
     if (index != -1) {
+      simpleTypeName = typeName.substring(index + 1);
       parentNode = MissingTypesCreator.this._virtualPackagesCache.getUnchecked(typeName.substring(0, index));
     }
 
     //
     Map<String, String> properties = new HashMap<>();
     properties.put("fqn", typeName);
+    properties.put("name", simpleTypeName);
 
     Node typeNode = createNode(properties, this.LABEL_MISSING_TYPE);
     if (parentNode != null) {

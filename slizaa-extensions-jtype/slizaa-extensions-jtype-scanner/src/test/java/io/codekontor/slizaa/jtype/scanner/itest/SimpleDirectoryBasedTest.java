@@ -20,12 +20,12 @@ package io.codekontor.slizaa.jtype.scanner.itest;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.jtype.scanner.JTypeSlizaaTestServerRule;
 import io.codekontor.slizaa.scanner.contentdefinition.FileBasedContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
@@ -33,7 +33,7 @@ import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProv
 public class SimpleDirectoryBasedTest {
 
   @ClassRule
-  public static JTypeSlizaaTestServerRule _server = new JTypeSlizaaTestServerRule(getSystemDefinition());
+  public static JTypeTestServerRule _server = new JTypeTestServerRule(getSystemDefinition());
 
   @Rule
   public BoltClientConnectionRule         _client = new BoltClientConnectionRule();

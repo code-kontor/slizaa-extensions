@@ -31,47 +31,49 @@ import apoc.result.RelationshipResult;
 
 public class JTypeProcedures {
 
-  /** - */
-  @Context
-  public GraphDatabaseService _databaseService;
+    /** - */
+    @Context
+    public GraphDatabaseService _databaseService;
 
-  @Procedure(name = "slizaa.jtype.createMissingTypes", mode = Mode.WRITE)
-  public Stream<RelationshipResult> test() {
-
-    //
-    final MissingTypesCreator virtualPackageCreator = new MissingTypesCreator(this._databaseService);
-
-    //
-    Result result = this._databaseService
-        .execute("MATCH (tref:TypeReference) WHERE NOT (tref)-[:BOUND_TO]->(:Type) RETURN tref, tref.fqn");
-
-    //
-    result.forEachRemaining(map -> {
-
-      //
-      String fullyQualifiedPackageName = map.get("tref.fqn").toString();
-
-      //
-      Node typeReferenceNode = (Node) map.get("tref");
-
-      // byte, short, int, long, float, double, char, and boolean
-      if (fullyQualifiedPackageName.equals("byte") || fullyQualifiedPackageName.equals("short")
-          || fullyQualifiedPackageName.equals("int") || fullyQualifiedPackageName.equals("long")
-          || fullyQualifiedPackageName.equals("float") || fullyQualifiedPackageName.equals("double")
-          || fullyQualifiedPackageName.equals("char") || fullyQualifiedPackageName.equals("boolean")) {
+    @Procedure(name = "slizaa.jtype.createMissingTypes", mode = Mode.WRITE)
+    public Stream<RelationshipResult> createMissingTypes() {
 
         //
-        throw new RuntimeException("" + typeReferenceNode.getAllProperties());
-      }
+        final MissingTypesCreator virtualPackageCreator = new MissingTypesCreator(this._databaseService);
 
-      //
-      Node virtualTypeNode = virtualPackageCreator.getOrCreateVirtualType(fullyQualifiedPackageName);
+        //
+        Result result = this._databaseService
+                .execute("MATCH (tref:TypeReference) WHERE NOT (tref)-[:BOUND_TO]->(:Type) RETURN tref, tref.fqn");
 
-      //
-      typeReferenceNode.createRelationshipTo(virtualTypeNode, RelationshipType.withName("BOUND_TO"));
-    });
+        //
+        result.forEachRemaining(map -> {
 
-    //
-    return Stream.of();
-  }
+            // get TypeReference and fqn
+            String typeReferenceFullyQualifiedName = map.get("tref.fqn").toString();
+            Node typeReferenceNode = (Node) map.get("tref");
+
+            // byte, short, int, long, float, double, char, and boolean
+            if (typeReferenceFullyQualifiedName.equals("byte") || typeReferenceFullyQualifiedName.equals("short")
+                    || typeReferenceFullyQualifiedName.equals("int") || typeReferenceFullyQualifiedName.equals("long")
+                    || typeReferenceFullyQualifiedName.equals("float") || typeReferenceFullyQualifiedName.equals("double")
+                    || typeReferenceFullyQualifiedName.equals("char") || typeReferenceFullyQualifiedName.equals("boolean")) {
+
+                //
+                throw new RuntimeException("" + typeReferenceNode.getAllProperties());
+            }
+
+            //
+
+            try {
+                Node virtualTypeNode = virtualPackageCreator.getOrCreateVirtualType(typeReferenceFullyQualifiedName);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+//            typeReferenceNode.createRelationshipTo(virtualTypeNode, RelationshipType.withName("BOUND_TO"));
+
+        });
+
+        //
+        return Stream.of();
+    }
 }

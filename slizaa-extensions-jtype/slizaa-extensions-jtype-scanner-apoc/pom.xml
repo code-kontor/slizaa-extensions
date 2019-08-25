@@ -76,6 +76,8 @@
 			<groupId>io.codekontor.slizaa.extensions</groupId>
 			<artifactId>slizaa-extensions-jtype-scanner</artifactId>
 			<version>${project.version}</version>
+			<classifier>tests</classifier>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>

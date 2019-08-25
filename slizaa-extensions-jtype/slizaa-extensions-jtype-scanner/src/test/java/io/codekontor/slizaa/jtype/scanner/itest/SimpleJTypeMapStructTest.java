@@ -22,19 +22,19 @@ import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFact
 
 import java.io.IOException;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.jtype.scanner.JTypeSlizaaTestServerRule;
 
 /**
   */
 public class SimpleJTypeMapStructTest {
 
   @ClassRule
-  public static JTypeSlizaaTestServerRule _server = new JTypeSlizaaTestServerRule(
+  public static JTypeTestServerRule _server = new JTypeTestServerRule(
       multipleBinaryMvnArtifacts(new String[] { "org.mapstruct", "mapstruct", "1.0.0.Beta1" },
           new String[] { "org.mapstruct", "mapstruct-processor", "1.0.0.Beta1" }));
 
@@ -45,7 +45,6 @@ public class SimpleJTypeMapStructTest {
    * <p>
    * </p>
    *
-   * @throws KernelException
    * @throws IOException
    */
   @Test

@@ -20,20 +20,20 @@ package io.codekontor.slizaa.jtype.scanner.itest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.jtype.scanner.JTypeSlizaaTestServerRule;
 
 /**
   */
 public class CreateSampleDatabase {
 
   @ClassRule
-  public static JTypeSlizaaTestServerRule _server = new JTypeSlizaaTestServerRule(
+  public static JTypeTestServerRule _server = new JTypeTestServerRule(
       multipleBinaryMvnArtifacts(new String[] { "org.mapstruct", "mapstruct", "1.2.0.Final" },
           new String[] { "org.mapstruct", "mapstruct-processor", "1.2.0.Final" }));
 

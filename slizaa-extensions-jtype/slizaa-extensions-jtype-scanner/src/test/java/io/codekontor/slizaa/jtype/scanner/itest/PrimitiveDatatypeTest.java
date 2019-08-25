@@ -20,17 +20,17 @@ package io.codekontor.slizaa.jtype.scanner.itest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
 
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.jtype.scanner.JTypeSlizaaTestServerRule;
 
 public class PrimitiveDatatypeTest {
 
   @ClassRule
-  public static JTypeSlizaaTestServerRule _server = new JTypeSlizaaTestServerRule(
+  public static JTypeTestServerRule _server = new JTypeTestServerRule(
       multipleBinaryMvnArtifacts(new String[] { "com.google.guava", "guava", "23.6.1-jre" }));
 
   @Rule

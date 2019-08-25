@@ -87,7 +87,6 @@ public class JTypeTestServerRule implements TestRule {
 
     public JTypeTestServerRule withDatabaseDirectory(File databaseDirectory) {
         checkNotNull(databaseDirectory);
-        checkState(databaseDirectory.isDirectory());
         this._databaseDirectory = databaseDirectory;
         return this;
     }
@@ -105,6 +104,10 @@ public class JTypeTestServerRule implements TestRule {
 
         this._databaseDirectory =
                 this._databaseDirectory != null ? this._databaseDirectory : createDatabaseDirectory();
+
+        if (!this._databaseDirectory.exists()) {
+            this._databaseDirectory.mkdirs();
+        }
 
         return new Statement() {
 

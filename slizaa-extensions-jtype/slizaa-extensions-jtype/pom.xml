@@ -38,7 +38,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>io.codekontor.slizaa</groupId>
-					<artifactId>slizaa-scanner-spi-api</artifactId>
+					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -49,7 +49,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>io.codekontor.slizaa</groupId>
-					<artifactId>slizaa-scanner-spi-api</artifactId>
+					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -60,7 +60,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>io.codekontor.slizaa</groupId>
-					<artifactId>slizaa-scanner-spi-api</artifactId>
+					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -72,7 +72,7 @@
 			<exclusions>
 				<exclusion>
 					<groupId>io.codekontor.slizaa</groupId>
-					<artifactId>slizaa-scanner-spi-api</artifactId>
+					<artifactId>*</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>

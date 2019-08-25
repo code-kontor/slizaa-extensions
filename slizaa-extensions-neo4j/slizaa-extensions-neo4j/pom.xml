@@ -39,16 +39,34 @@
 			<groupId>io.codekontor.slizaa.extensions</groupId>
 			<artifactId>slizaa-extensions-neo4j-apoc</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.codekontor.slizaa</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.codekontor.slizaa.extensions</groupId>
 			<artifactId>slizaa-extensions-neo4j-importer</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.codekontor.slizaa</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>io.codekontor.slizaa.extensions</groupId>
 			<artifactId>slizaa-extensions-neo4j-graphdbfactory</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>io.codekontor.slizaa</groupId>
+					<artifactId>*</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 	

@@ -30,6 +30,10 @@
 
 	<artifactId>slizaa-extensions-neo4j</artifactId>
 
+	<properties>
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>io.codekontor.slizaa.extensions</groupId>

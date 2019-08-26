@@ -70,8 +70,21 @@ public class JTypeAdHocTest {
                 .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
 
         //
-        try (FileWriter fileWriter = new FileWriter(new File(ROOT_DIR,"dump.txt"))) {
-            HGNodeUtils.dumpNode(rootNode, fileWriter);
+//        try (FileWriter fileWriter = new FileWriter(new File(ROOT_DIR,"dump.txt"))) {
+//            HGNodeUtils.dumpNode(rootNode, fileWriter);
+//        }
+
+        //
+        List<Long> missingTypes = CLIENT.getBoltClient().syncExecCypherQuery("MATCH (t:MissingType) RETURN t")
+                .list(record -> record.get("t").asNode().id());
+
+        //
+        for (Long missingType : missingTypes) {
+            HGNode missingTypeNode = rootNode.lookupNode(missingType);
+            if (missingTypeNode != null) {
+                System.out.println(missingTypeNode.getIncomingCoreDependencies().size());
+
+            }
         }
     }
 }

@@ -64,13 +64,10 @@ public class JTypeMissingTypesTest {
     //
     assertThat(missingTypes).hasSize(341);
     for (Long missingType : missingTypes) {
-      HGNode node = rootNode.lookupNode(missingType);
-      assertThat(node).isNotNull();
-    }
+      HGNode missingTypeNode = rootNode.lookupNode(missingType);
+      assertThat(missingTypeNode).isNotNull();
 
-    //
-    for (HGNode node : rootNode.getChildren()) {
-      assertThat(node.getNodeSource(GraphDbNodeSource.class).get().getProperties()).isNotEmpty();
+      System.out.println(missingTypeNode.getIncomingCoreDependencies().size());
     }
   }
 }

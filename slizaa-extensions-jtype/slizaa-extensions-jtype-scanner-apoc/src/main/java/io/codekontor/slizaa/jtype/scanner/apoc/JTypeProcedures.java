@@ -66,10 +66,10 @@ public class JTypeProcedures {
 
             try {
                 Node virtualTypeNode = virtualPackageCreator.getOrCreateVirtualType(typeReferenceFullyQualifiedName);
+                typeReferenceNode.createRelationshipTo(virtualTypeNode, RelationshipType.withName("BOUND_TO"));
             } catch (Exception e) {
                 e.printStackTrace();
             }
-//            typeReferenceNode.createRelationshipTo(virtualTypeNode, RelationshipType.withName("BOUND_TO"));
 
         });
 

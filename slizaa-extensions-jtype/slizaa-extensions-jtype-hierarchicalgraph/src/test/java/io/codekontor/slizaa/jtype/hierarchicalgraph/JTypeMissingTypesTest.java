@@ -66,8 +66,6 @@ public class JTypeMissingTypesTest {
     for (Long missingType : missingTypes) {
       HGNode missingTypeNode = rootNode.lookupNode(missingType);
       assertThat(missingTypeNode).isNotNull();
-
-      System.out.println(missingTypeNode.getIncomingCoreDependencies().size());
     }
   }
 }

@@ -43,13 +43,13 @@ public class JTypeProceduresTest {
      * </p>
      */
     @Test
-    public void testJtypeProcedures() {
+    public void testJTypeProcedures() {
 
 
         StatementResult statementResult = this._client.getBoltClient().syncExecCypherQuery("CALL slizaa.jtype.createMissingTypes()");
 
         statementResult = this._client.getBoltClient().syncExecCypherQuery("Match(t:MissingType) return count(t) as count");
-        assertThat(statementResult.single().get("count").asInt()).isEqualTo(910);
+        assertThat(statementResult.single().get("count").asInt()).isEqualTo(904);
 
         statementResult = this._client.getBoltClient().syncExecCypherQuery("Match(t:MissingType) return t.name, t.fqn");
         statementResult.forEachRemaining(r -> {

@@ -33,78 +33,81 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
 
 public class HGNodeUtils {
 
-    /**
-     * <p>
-     * </p>
-     *
-     * @param node
-     * @return
-     */
-    public static Map<String, String> getProperties(HGNode node) {
+  /**
+   * <p>
+   * </p>
+   *
+   * @param node
+   * @return
+   */
+  public static Map<String, String> getProperties(HGNode node) {
 
-        //
-        INodeSource nodeSource = node.getNodeSource();
+    //
+    INodeSource nodeSource = node.getNodeSource();
 
-        //
-        if (nodeSource instanceof GraphDbNodeSource) {
-            return ((GraphDbNodeSource) nodeSource).getProperties().map();
-        }
-
-        //
-        else {
-            return Collections.emptyMap();
-        }
+    //
+    if (nodeSource instanceof GraphDbNodeSource) {
+      return ((GraphDbNodeSource) nodeSource).getProperties().map();
     }
 
-    /**
-     * <p>
-     * </p>
-     *
-     * @param node
-     * @return
-     */
-    public static List<String> getLabels(HGNode node) {
+    //
+    else {
+      return Collections.emptyMap();
+    }
+  }
 
-        //
-        INodeSource nodeSource = node.getNodeSource();
+  /**
+   * <p>
+   * </p>
+   *
+   * @param node
+   * @return
+   */
+  public static List<String> getLabels(HGNode node) {
 
-        //
-        if (nodeSource instanceof GraphDbNodeSource) {
-            return ((GraphDbNodeSource) nodeSource).getLabels();
-        }
+    //
+    INodeSource nodeSource = node.getNodeSource();
 
-        //
-        else {
-            return Collections.emptyList();
-        }
+    //
+    if (nodeSource instanceof GraphDbNodeSource) {
+      return ((GraphDbNodeSource) nodeSource).getLabels();
     }
 
-    /**
-     * <p>
-     * </p>
-     *
-     * @param hgNode
-     */
-    public static void dumpNode(HGNode hgNode, Writer stringWriter) throws IOException {
-        dumpNode(hgNode, 0, stringWriter);
+    //
+    else {
+      return Collections.emptyList();
+    }
+  }
+
+  /**
+   * <p>
+   * </p>
+   *
+   * @param hgNode
+   */
+  public static void dumpNode(HGNode hgNode, Writer stringWriter) throws IOException {
+    dumpNode(hgNode, 0, stringWriter);
+  }
+
+  /**
+   * <p>
+   * </p>
+   */
+  private static void dumpNode(final HGNode node, final int indent, Writer stringWriter) throws IOException {
+
+    //
+    if (HGNodeUtils.getLabels(node).contains("Method") || HGNodeUtils.getLabels(node).contains("Field")) {
+      return;
     }
 
-    /**
-     * <p>
-     * </p>
-     */
-    private static void dumpNode(final HGNode node, final int indent, Writer stringWriter) throws IOException {
+    //
+    String indentSpace = new String(new char[indent]).replace('\0', ' ');
 
-        //
-        String indentSpace = new String(new char[indent]).replace('\0', ' ');
+    String nodeString = indentSpace + HGNodeUtils.getProperties(node).get("fqn") + "(" + node.getIdentifier() + ")\n";
+    stringWriter.write(nodeString);
 
-        String nodeString = indentSpace + HGNodeUtils.getProperties(node).get("fqn") + "(" + node.getIdentifier() + ")\n";
-        stringWriter.write(nodeString);
-
-        if (!HGNodeUtils.getLabels(node).contains("Type")) {
-            for (HGNode childNode : checkNotNull(node).getChildren()) {
-                dumpNode(childNode, indent + 1, stringWriter);
-            }
-        }
+    for (HGNode childNode : checkNotNull(node).getChildren()) {
+      dumpNode(childNode, indent + 1, stringWriter);
     }
+  }
 }

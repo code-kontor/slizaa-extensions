@@ -42,10 +42,15 @@ import io.codekontor.slizaa.scanner.spi.parser.model.INode;
 import io.codekontor.slizaa.scanner.spi.parser.model.IRelationship;
 import io.codekontor.slizaa.scanner.spi.parser.model.NodeFactory;
 import io.codekontor.slizaa.scanner.spi.parser.model.resource.CoreModelRelationshipType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  */
 public class JTypeClassVisitor extends ClassVisitor {
+
+  /** - */
+  private Logger                     LOGGER = LoggerFactory.getLogger(JTypeClassVisitor.class);
 
   /** - */
   private INode                      _typeBean;
@@ -61,7 +66,7 @@ public class JTypeClassVisitor extends ClassVisitor {
    * Creates a new instance of type {@link JTypeClassVisitor}.
    * </p>
    *
-   * @param batchInserter
+   * @param parserFactory
    */
   public JTypeClassVisitor(JTypeByteCodeParserFactory parserFactory) {
     super(Opcodes.ASM7);
@@ -111,8 +116,9 @@ public class JTypeClassVisitor extends ClassVisitor {
     this._typeBean.addLabel(getJTypeLabel(access));
 
     // class name
-    this._typeBean.putProperty(ITypeNode.FQN, name.replace('/', '.'));
-    this._typeBean.putProperty(ITypeNode.NAME, JavaTypeUtils.getSimpleName(name.replace('/', '.')));
+    String fullyQualifiedName = name.replace('/', '.');
+    this._typeBean.putProperty(ITypeNode.FQN, fullyQualifiedName);
+    this._typeBean.putProperty(ITypeNode.NAME, JavaTypeUtils.getSimpleName(fullyQualifiedName));
 
     // class version
     this._typeBean.putProperty(ITypeNode.CLASS_VERSION, Integer.toString(version));
@@ -179,6 +185,25 @@ public class JTypeClassVisitor extends ClassVisitor {
       default:
         break;
       }
+    }
+
+    // add 'is inner class defined by'
+    int indexOfDollarSign = fullyQualifiedName.indexOf('$');
+
+    if (indexOfDollarSign != -1) {
+
+      String computedOuterFullyQualifiedName = fullyQualifiedName.substring(0, indexOfDollarSign);
+
+      if (LOGGER.isDebugEnabled()) {
+        LOGGER.debug("Creating reference 'IS_INNER_CLASS_DEFINED_BY' from type {} to type reference {}.",
+            this._typeBean.getFullyQualifiedName(), computedOuterFullyQualifiedName);
+      }
+
+      this._classLocalReferenceCache.addTypeReference(this._typeBean, computedOuterFullyQualifiedName,
+          JTypeModelRelationshipType.IS_INNER_CLASS_DEFINED_BY);
+
+      this._typeBean.putProperty(ITypeNode.OUTER_CLASSNAME, computedOuterFullyQualifiedName);
+      this._typeBean.putProperty(ITypeNode.INNER_CLASS, true);
     }
   }
 
@@ -351,31 +376,31 @@ public class JTypeClassVisitor extends ClassVisitor {
   @Override
   public void visitOuterClass(String owner, String name, String rawSignature) {
 
-    // owner
-    this._classLocalReferenceCache.addTypeReference(this._typeBean, Type.getObjectType(owner),
-        JTypeModelRelationshipType.REFERENCES);
-
-    // TODO: EnclosingMethod!
-    if (name != null && rawSignature != null) {
-
-      // return type
-      Type returnType = org.objectweb.asm.Type.getReturnType(rawSignature);
-      if (!Utils.isVoidOrPrimitive(returnType)) {
-        this._classLocalReferenceCache.addTypeReference(this._typeBean,
-            Utils.resolveArrayType(returnType).getClassName(), JTypeModelRelationshipType.REFERENCES);
-      }
-
-      // arg types type
-      org.objectweb.asm.Type[] types = org.objectweb.asm.Type.getArgumentTypes(rawSignature);
-      for (int i = 0; i < types.length; i++) {
-        if (!Utils.isVoidOrPrimitive(types[i])) {
-
-          // TODO: array types!
-          this._classLocalReferenceCache.addTypeReference(this._typeBean,
-              Utils.resolveArrayType(types[i]).getClassName(), JTypeModelRelationshipType.REFERENCES);
-        }
-      }
-    }
+    // // owner
+    // this._classLocalReferenceCache.addTypeReference(this._typeBean, Type.getObjectType(owner),
+    // JTypeModelRelationshipType.REFERENCES);
+    //
+    // // TODO: EnclosingMethod!
+    // if (name != null && rawSignature != null) {
+    //
+    // // return type
+    // Type returnType = org.objectweb.asm.Type.getReturnType(rawSignature);
+    // if (!Utils.isVoidOrPrimitive(returnType)) {
+    // this._classLocalReferenceCache.addTypeReference(this._typeBean,
+    // Utils.resolveArrayType(returnType).getClassName(), JTypeModelRelationshipType.REFERENCES);
+    // }
+    //
+    // // arg types type
+    // org.objectweb.asm.Type[] types = org.objectweb.asm.Type.getArgumentTypes(rawSignature);
+    // for (int i = 0; i < types.length; i++) {
+    // if (!Utils.isVoidOrPrimitive(types[i])) {
+    //
+    // // TODO: array types!
+    // this._classLocalReferenceCache.addTypeReference(this._typeBean,
+    // Utils.resolveArrayType(types[i]).getClassName(), JTypeModelRelationshipType.REFERENCES);
+    // }
+    // }
+    // }
   }
 
   @Override
@@ -387,74 +412,89 @@ public class JTypeClassVisitor extends ClassVisitor {
   @Override
   public void visitInnerClass(String name, String outerName, String innerName, int access) {
 
+    // if (LOGGER.isDebugEnabled()) {
+    // LOGGER.debug("visitInnerClass( {}, {}, {}, {} )", name, outerName, innerName, access);
+    // }
     //
-    String fullyQualifiedName = name.replace('/', '.');
-    String computedOuterFullyQualifiedName = fullyQualifiedName.substring(0, fullyQualifiedName.lastIndexOf('$'));
-
+    // //
+    // String fullyQualifiedName = name.replace('/', '.');
+    // String computedOuterFullyQualifiedName = fullyQualifiedName.substring(0, fullyQualifiedName.indexOf('$'));
     //
-    if (fullyQualifiedName.equals(this._typeBean.getFullyQualifiedName())) {
-
-      // named inner class...
-      if (outerName != null) {
-
-        //
-        this._classLocalReferenceCache.addTypeReference(this._typeBean, outerName.replace('/', '.'),
-            JTypeModelRelationshipType.IS_INNER_CLASS_DEFINED_BY);
-
-        this._typeBean.putProperty(ITypeNode.OUTER_CLASSNAME, outerName.replace('/', '.'));
-      }
-
-      // anonymous inner class
-      else {
-
-        //
-        this._classLocalReferenceCache.addTypeReference(this._typeBean, computedOuterFullyQualifiedName,
-            JTypeModelRelationshipType.IS_INNER_CLASS_DEFINED_BY);
-
-        //
-        this._typeBean.putProperty(ITypeNode.OUTER_CLASSNAME, computedOuterFullyQualifiedName);
-
-      }
-
-      this._typeBean.putProperty(ITypeNode.INNER_CLASS, true);
-
-      // access flags
-      // http://stackoverflow.com/questions/24622658/access-flag-for-private-inner-classes-in-java-spec-inconsistent-with-reflectio
-      if (access != 0) {
-
-        this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_FLAGS, Integer.toHexString(access).toUpperCase());
-
-        //
-        if ((access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC) {
-          this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.PUBLIC);
-        }
-        //
-        else if ((access & Opcodes.ACC_PROTECTED) == Opcodes.ACC_PROTECTED) {
-          this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.PROTECTED);
-        }
-        //
-        else if ((access & Opcodes.ACC_PRIVATE) == Opcodes.ACC_PRIVATE) {
-          this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.PRIVATE);
-        }
-        //
-        else {
-          this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.DEFAULT);
-        }
-      }
-    }
-
-    // TODO
-    else if (computedOuterFullyQualifiedName.equals(this._typeBean.getFullyQualifiedName())) {
-
-      //
-      this._classLocalReferenceCache.addTypeReference(this._typeBean, fullyQualifiedName,
-          JTypeModelRelationshipType.DEFINES_INNER_CLASS);
-    }
-
+    // //
+    // if (fullyQualifiedName.equals(this._typeBean.getFullyQualifiedName())) {
+    //
+    // // named inner class...
+    // if (outerName != null) {
+    //
+    // String outerTypeName = outerName.replace('/', '.');
+    //
+    // if (LOGGER.isDebugEnabled()) {
+    // LOGGER.debug("Creating reference 'IS_INNER_CLASS_DEFINED_BY' from type {} to type reference {}.",
+    // this._typeBean.getFullyQualifiedName(), outerTypeName);
+    // }
+    //
+    // this._classLocalReferenceCache.addTypeReference(this._typeBean, outerTypeName,
+    // JTypeModelRelationshipType.IS_INNER_CLASS_DEFINED_BY);
+    //
+    // this._typeBean.putProperty(ITypeNode.OUTER_CLASSNAME, outerTypeName);
+    // }
+    //
+    // // anonymous inner class
+    // else {
+    //
+    // if (LOGGER.isDebugEnabled()) {
+    // LOGGER.debug("Creating reference 'IS_INNER_CLASS_DEFINED_BY' from type {} to type reference {}.",
+    // this._typeBean.getFullyQualifiedName(), computedOuterFullyQualifiedName);
+    // }
+    //
+    // //
+    // this._classLocalReferenceCache.addTypeReference(this._typeBean, computedOuterFullyQualifiedName,
+    // JTypeModelRelationshipType.IS_INNER_CLASS_DEFINED_BY);
+    //
+    // //
+    // this._typeBean.putProperty(ITypeNode.OUTER_CLASSNAME, computedOuterFullyQualifiedName);
+    //
+    // }
+    //
+    // this._typeBean.putProperty(ITypeNode.INNER_CLASS, true);
+    //
+    // // access flags
+    // //
+    // http://stackoverflow.com/questions/24622658/access-flag-for-private-inner-classes-in-java-spec-inconsistent-with-reflectio
+    // if (access != 0) {
+    //
+    // this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_FLAGS, Integer.toHexString(access).toUpperCase());
+    //
+    // //
+    // if ((access & Opcodes.ACC_PUBLIC) == Opcodes.ACC_PUBLIC) {
+    // this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.PUBLIC);
+    // }
+    // //
+    // else if ((access & Opcodes.ACC_PROTECTED) == Opcodes.ACC_PROTECTED) {
+    // this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.PROTECTED);
+    // }
+    // //
+    // else if ((access & Opcodes.ACC_PRIVATE) == Opcodes.ACC_PRIVATE) {
+    // this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.PRIVATE);
+    // }
     // //
     // else {
-    // this._classLocalReferenceCache.addTypeReference(this._typeBean, outerName.replace('/', '.'),
-    // JTypeModelRelationshipType.REFERENCES);
+    // this._typeBean.putProperty(ITypeNode.INNER_CLASS_ACCESS_LEVEL, IVisibility.DEFAULT);
+    // }
+    // }
+    // }
+    //
+    // // TODO
+    // else if (computedOuterFullyQualifiedName.equals(this._typeBean.getFullyQualifiedName())) {
+    //
+    // if (LOGGER.isDebugEnabled()) {
+    // LOGGER.debug("Creating reference 'DEFINES_INNER_CLASS' from type {} to type reference {}.",
+    // this._typeBean.getFullyQualifiedName(), computedOuterFullyQualifiedName);
+    // }
+    //
+    // //
+    // this._classLocalReferenceCache.addTypeReference(this._typeBean, computedOuterFullyQualifiedName,
+    // JTypeModelRelationshipType.DEFINES_INNER_CLASS);
     // }
 
     //

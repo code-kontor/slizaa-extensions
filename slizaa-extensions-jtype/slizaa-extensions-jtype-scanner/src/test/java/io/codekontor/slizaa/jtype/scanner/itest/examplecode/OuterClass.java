@@ -26,3 +26,7 @@ public class OuterClass {
     }
   }
 }
+
+class ClassInForeignSourceFile {
+
+}

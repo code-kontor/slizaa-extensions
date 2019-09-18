@@ -27,6 +27,7 @@ import java.util.List;
 import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.neo4j.driver.v1.Record;
 import org.neo4j.driver.v1.StatementResult;
 import org.neo4j.driver.v1.types.Node;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
@@ -44,12 +45,44 @@ public class ExampleCodeTest {
 
   /** - */
   @ClassRule
-  public static JTypeTestServerRule _server = new JTypeTestServerRule(simpleBinaryFile("jtype", "1.2.3",
+  public static JTypeTestServerRule      _server = new JTypeTestServerRule(simpleBinaryFile("jtype", "1.2.3",
       ExampleCodeTest.class.getProtectionDomain().getCodeSource().getLocation().getFile()));
 
   /** - */
   @ClassRule
-  public static BoltClientConnectionRule  _client = new BoltClientConnectionRule();
+  public static BoltClientConnectionRule _client = new BoltClientConnectionRule();
+
+  @Test
+  public void test_AnonymousInnerClass() {
+
+    //
+    StatementResult statementResult = _client.getBoltClient().syncExecCypherQuery(
+        "MATCH (t:Type)-[rel:DEFINES_INNER_CLASS]->(target) WHERE t.name = 'ClassWithAnonymousInnerClass' RETURN t.fqn, target.fqn, target");
+
+    // get the single result line
+    Record result = statementResult.single();
+
+    assertThat(result.get("t.fqn").asString())
+        .isEqualTo("io.codekontor.slizaa.jtype.scanner.itest.examplecode.ClassWithAnonymousInnerClass");
+    assertThat(result.get("target.fqn").asString())
+        .isEqualTo("io.codekontor.slizaa.jtype.scanner.itest.examplecode.ClassWithAnonymousInnerClass$1");
+
+    //
+    statementResult = _client.getBoltClient().syncExecCypherQuery(
+        "MATCH (t) WHERE t.fqn = 'io.codekontor.slizaa.jtype.scanner.itest.examplecode.ClassWithAnonymousInnerClass$1' RETURN t");
+
+    //
+    statementResult.forEachRemaining(r -> System.out.println(" - " + r.get("t").asNode().asMap()));
+
+    //
+    statementResult = _client.getBoltClient().syncExecCypherQuery(
+        "MATCH (t:Type)-[rel:DEFINES_INNER_CLASS]->(target)-[:BOUND_TO]->(t1:Type) WHERE t.name = 'ClassWithAnonymousInnerClass' RETURN t, t1");
+
+    statementResult.forEachRemaining(
+        r -> System.out.println(" * " + r.get("t").asNode().asMap() + " : " + r.get("t1").asNode().asMap()));
+
+    assertThat(result.get("target").asNode().hasLabel("TypeReference")).isTrue();
+  }
 
   /**
    * <p>
@@ -299,8 +332,8 @@ public class ExampleCodeTest {
     List<String[]> records = statementResult
         .list(rec -> new String[] { rec.get(0).asString(), rec.get(1).asString(), rec.get(2).asString() });
 
-    assertThat(records).containsOnly(
-        new String[] { "test", "IS_DEFINED_BY", "io.codekontor.slizaa.jtype.scanner.itest.examplecode.ExampleClassWithArrays" });
+    assertThat(records).containsOnly(new String[] { "test", "IS_DEFINED_BY",
+        "io.codekontor.slizaa.jtype.scanner.itest.examplecode.ExampleClassWithArrays" });
   }
 
   /**

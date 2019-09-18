@@ -15,23 +15,16 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.jtype.scanner.model;
+package io.codekontor.slizaa.jtype.scanner.itest.examplecode;
 
-import io.codekontor.slizaa.scanner.spi.parser.model.RelationshipType;
+public class ClassWithAnonymousInnerClass {
 
-/**
- * <p>
- * </p>
- *
- * @author Gerd W&uuml;therich (gerd@gerd-wuetherich.de)
- */
-public enum JTypeModelRelationshipType implements RelationshipType {
-
-  EXTENDS, IMPLEMENTS, BOUND_TO, HAS_PARAMETER, RETURNS, THROWS, IS_OF_TYPE, READS, WRITES, READS_FIELD_OF_TYPE, WRITES_FIELD_OF_TYPE, ANNOTATED_BY, DEFINES_LOCAL_VARIABLE, USES_TYPE_CONSTANT, INVOKES, INVOKES_METHOD_FROM, INVOKED_METHOD_RETURNS, INVOKED_METHOD_HAS_PARAMETER, IS_INNER_CLASS_DEFINED_BY, INNER_CLASS_REFERENCES, IS_DEFINED_BY,
-
-  //
-  DEPENDS_ON,
-
-  @Deprecated
-  REFERENCES, 
+    public static void main(String[] args) {
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                System.out.println("Hello!");
+            }
+        };
+    }
 }

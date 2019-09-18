@@ -57,7 +57,8 @@ public class JTypeAdHocTest {
     public static JTypeTestServerRule SERVER = new JTypeTestServerRule(
             directoryContent(new File(ROOT_DIR, "content")))
             .withDatabaseDirectory(new File(ROOT_DIR, "database"))
-            .withNoDeletionAfterTest();
+            // .withNoDeletionAfterTest()
+            ;
 
     @ClassRule
     public static BoltClientConnectionRule CLIENT = new BoltClientConnectionRule();
@@ -70,21 +71,13 @@ public class JTypeAdHocTest {
                 .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
 
         //
-//        try (FileWriter fileWriter = new FileWriter(new File(ROOT_DIR,"dump.txt"))) {
-//            HGNodeUtils.dumpNode(rootNode, fileWriter);
-//        }
-
-        //
-        List<Long> missingTypes = CLIENT.getBoltClient().syncExecCypherQuery("MATCH (t:MissingType) RETURN t")
-                .list(record -> record.get("t").asNode().id());
-
-        //
-        for (Long missingType : missingTypes) {
-            HGNode missingTypeNode = rootNode.lookupNode(missingType);
-            if (missingTypeNode != null) {
-                System.out.println(missingTypeNode.getIncomingCoreDependencies().size());
-
-            }
+      try (FileWriter fileWriter = new FileWriter(new File(ROOT_DIR,"dump.txt"))) {
+            HGNodeUtils.dumpNode(rootNode, fileWriter);
         }
+
+        //
+        String query = "MATCH (t:Type)-[rel:IS_INNER_CLASS_DEFINED_BY]->(tr) return t, tr";
+        CLIENT.getBoltClient().syncExecCypherQuery(query)
+                .forEachRemaining(r -> System.out.println(r.get("t").asNode().asMap() + " => " + r.get("tr").asNode().asMap()));
     }
 }

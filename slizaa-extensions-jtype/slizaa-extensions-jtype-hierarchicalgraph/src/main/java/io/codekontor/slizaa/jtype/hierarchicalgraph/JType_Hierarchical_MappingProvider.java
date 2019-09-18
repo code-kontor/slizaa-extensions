@@ -33,7 +33,7 @@ public class JType_Hierarchical_MappingProvider extends DefaultMappingProvider {
 	public JType_Hierarchical_MappingProvider() {
 
 		//
-		super(IMappingProviderMetadata.createMetadata("io.codekontor.slizaa.jtype.core.TypesOnly_Hierarchicalackages",
+		super(IMappingProviderMetadata.createMetadata("io.codekontor.slizaa.jtype.core.TypesOnly_HierarchicalPackages",
 				"Slizaa JType (types only, hierarchical packages)", null, null),
 				new JType_Hierarchical_HierarchyProvider(), new JType_DependencyProvider(),
 				new JType_LabelProvider(false), new JType_NodeComparator());

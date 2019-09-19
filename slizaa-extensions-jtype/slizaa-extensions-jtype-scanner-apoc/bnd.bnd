@@ -1,5 +1,0 @@
-Fragment-Host: io.codekontor.slizaa.neo4j.osgi
-Slizaa-Extension: true
-Import-Package:!*
--snapshot: BUILD-${tstamp}
--includeresource: OSGI-OPT/src=src/main/java

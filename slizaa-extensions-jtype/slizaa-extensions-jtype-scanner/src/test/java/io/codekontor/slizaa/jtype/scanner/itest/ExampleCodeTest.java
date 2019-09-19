@@ -57,17 +57,17 @@ public class ExampleCodeTest {
 
     //
     StatementResult statementResult = _client.getBoltClient().syncExecCypherQuery(
-        "MATCH (t:Type)-[rel:DEFINES_INNER_CLASS]->(target) WHERE t.name = 'ClassWithAnonymousInnerClass' RETURN t.fqn, target.fqn, target");
+        "MATCH (inner)-[rel:IS_INNER_CLASS_DEFINED_BY]->(outer:TypeReference) WHERE outer.fqn = 'io.codekontor.slizaa.jtype.scanner.itest.examplecode.ClassWithAnonymousInnerClass' RETURN outer.fqn, inner.fqn, inner");
 
     // get the single result line
     Record result = statementResult.single();
 
-    assertThat(result.get("t.fqn").asString())
+    assertThat(result.get("outer.fqn").asString())
         .isEqualTo("io.codekontor.slizaa.jtype.scanner.itest.examplecode.ClassWithAnonymousInnerClass");
-    assertThat(result.get("target.fqn").asString())
+    assertThat(result.get("inner.fqn").asString())
         .isEqualTo("io.codekontor.slizaa.jtype.scanner.itest.examplecode.ClassWithAnonymousInnerClass$1");
 
-    //
+/*    //
     statementResult = _client.getBoltClient().syncExecCypherQuery(
         "MATCH (t) WHERE t.fqn = 'io.codekontor.slizaa.jtype.scanner.itest.examplecode.ClassWithAnonymousInnerClass$1' RETURN t");
 
@@ -81,7 +81,7 @@ public class ExampleCodeTest {
     statementResult.forEachRemaining(
         r -> System.out.println(" * " + r.get("t").asNode().asMap() + " : " + r.get("t1").asNode().asMap()));
 
-    assertThat(result.get("target").asNode().hasLabel("TypeReference")).isTrue();
+    assertThat(result.get("target").asNode().hasLabel("TypeReference")).isTrue();*/
   }
 
   /**

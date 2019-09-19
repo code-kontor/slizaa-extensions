@@ -1,5 +1,0 @@
-Slizaa-Extension: true
-Import-Package:!org.objectweb.asm.*,*
-Export-Package: !*.internal.*, io.codekontor.slizaa.jtype.scanner.*
--snapshot: BUILD-${tstamp}
--includeresource: OSGI-OPT/src=src/main/java

@@ -1,4 +1,0 @@
-Slizaa-Extension: true
-Export-Package: io.codekontor.slizaa.jtype.hierarchicalgraph*
--snapshot: BUILD-${tstamp}
--includeresource: OSGI-OPT/src=src/main/java

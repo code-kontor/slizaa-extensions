@@ -18,7 +18,7 @@
 		<module>slizaa-extensions-parent</module>
 		<module>slizaa-extensions-neo4j</module>
 		<module>slizaa-extensions-jtype</module>
-		<!-- module>io.codekontor.slizaa.jtype</module -->
+		<module>io.codekontor.slizaa.jtype</module>
 	</modules>
 
 </project>

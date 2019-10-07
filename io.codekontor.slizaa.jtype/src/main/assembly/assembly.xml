@@ -28,10 +28,11 @@
     <fileSets>
         <fileSet>
             <directory>${project.basedir}/src/main/assembly</directory>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>./</outputDirectory>
             <includes>
                 <include>README*</include>
                 <include>application.properties</include>
+                <include>LICENSE.txt</include>
             </includes>
         </fileSet>
     </fileSets>

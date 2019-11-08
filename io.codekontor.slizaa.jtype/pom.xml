@@ -27,7 +27,7 @@
     <parent>
         <groupId>io.codekontor.slizaa.extensions</groupId>
         <artifactId>slizaa-extensions-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>1.0.0.M3</version>
         <relativePath>../slizaa-extensions-parent/pom.xml</relativePath>
     </parent>
 
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>io.codekontor.slizaa</groupId>
             <artifactId>slizaa-web</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0.M3</version>
         </dependency>
         <dependency>
             <groupId>io.codekontor.slizaa.extensions</groupId>

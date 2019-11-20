@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.jtype.hierarchicalgraph;
+package io.codekontor.slizaa.jtype.hierarchicalgraph.parser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,69 +28,58 @@ public class MethodSignatureParser {
   
   public String parse( String line) {
 
-    // Now create matcher object.
     Matcher m = r.matcher(line);
     if (m.find()) {
       
-      String returnType = simpleName(m.group(1));
-      String name = simpleName(m.group(2));
+      String returnType = ParserUtil.simpleName(m.group(1));
+      String name = ParserUtil.simpleName(m.group(2));
+      boolean isConstructor = false;
+      if ("<init>".equals(name)) {
+        isConstructor = true;
+        name = typeName(m.group(2), name);
+      }
 
       //
       StringBuilder builder = new StringBuilder();
-      String[] arguments = split(m.group(4));
+      String[] arguments = ParserUtil.split(m.group(4), ",");
       for (int i = 0; i < arguments.length; i++) {
-        builder.append(simpleName(arguments[i]));
+        builder.append(ParserUtil.simpleName(arguments[i]));
         if (i+1 < arguments.length) {
           builder.append(", ");
         }
       }
-      
-      return name + "(" + builder.toString() + "): " + returnType;
+
+      if (isConstructor) {
+        return name + "(" + builder.toString() + ")";
+      } else {
+        return name + "(" + builder.toString() + "): " + returnType;
+      }
     } else {
       return line;
     }
   }
 
-  private static String[] split(String names) {
+  private static String typeName(String fqn, String methodName ) {
 
     //
-    if (names == null) {
-      return new String[0];
+    if (fqn == null) {
+      return fqn;
     }
 
-    //
-    names = names.trim();
+    String result = null;
 
     //
-    if (names.length() == 0) {
-      return new String[0];
-    }
-
-    //
-    return names.split(",");
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @param name
-   * @return
-   */
-  private static String simpleName(String name) {
-
-    //
-    if (name == null) {
-      return name;
-    }
-
-    //
-    int lastIndex = name.lastIndexOf('.');
+    int lastIndex = fqn.lastIndexOf('.' + methodName);
     if (lastIndex != -1) {
-      return name.substring(lastIndex + 1, name.length());
+      result = fqn.substring(0, lastIndex);
+    }
+
+    lastIndex = result.lastIndexOf('.');
+    if (lastIndex != -1) {
+      result = result.substring(lastIndex+1);
     }
 
     //
-    return name;
+    return result;
   }
 }

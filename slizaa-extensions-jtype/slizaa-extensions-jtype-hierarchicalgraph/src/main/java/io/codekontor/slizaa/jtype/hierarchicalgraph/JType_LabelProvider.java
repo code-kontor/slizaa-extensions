@@ -23,6 +23,8 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.labelprovider.AbstractLabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.labelprovider.dsl.ILabelDefinitionProcessor;
+import io.codekontor.slizaa.jtype.hierarchicalgraph.parser.FieldSignatureParser;
+import io.codekontor.slizaa.jtype.hierarchicalgraph.parser.MethodSignatureParser;
 
 /**
  * <p>
@@ -39,6 +41,8 @@ public class JType_LabelProvider extends AbstractLabelDefinitionProvider
 	/** - */
 	private final MethodSignatureParser _methodSignatureParser;
 
+	private final FieldSignatureParser _fieldSignatureParser;
+
 	/**
 	 * <p>
 	 * </p>
@@ -50,6 +54,7 @@ public class JType_LabelProvider extends AbstractLabelDefinitionProvider
 
 		//
 		this._methodSignatureParser = new MethodSignatureParser();
+		this._fieldSignatureParser = new FieldSignatureParser();
 	}
 
 	/**
@@ -153,11 +158,8 @@ public class JType_LabelProvider extends AbstractLabelDefinitionProvider
 						.then(setOverlayImage(ICO, OverlayPosition.TOP_RIGHT)),*/
 
 				when(nodeHasLabel("Class")).then(setBaseImage(ICONS_CLASS_OBJ_SVG)),
-
 				when(nodeHasLabel("Annotation")).then(setBaseImage(ICONS_ANNOTATION_OBJ_SVG)),
-
 				when(nodeHasLabel("Enum")).then(setBaseImage(ICONS_ENUM_OBJ_SVG)),
-
 				when(nodeHasLabel("Interface")).then(setBaseImage(ICONS_INT_OBJ_SVG)));
 		// @formatter:on
 	}
@@ -177,11 +179,8 @@ public class JType_LabelProvider extends AbstractLabelDefinitionProvider
         setIsOverlayImage(true),
 
         when(nodeHasPropertyWithValue("visibility", "public")).then(setBaseImage(ICONS_METHPUB_OBJ_SVG)),
-
         when(nodeHasPropertyWithValue("visibility", "private")).then(setBaseImage(ICONS_METHOD_PRIVATE_OBJ_SVG)),
-
         when(nodeHasPropertyWithValue("visibility", "protected")).then(setBaseImage(ICONS_METHOD_PROTECTED_OBJ_SVG)),
-
         when(nodeHasPropertyWithValue("visibility", "default")).then(setBaseImage(ICONS_METHDEF_OBJ_SVG)));
     // @formatter:on
 	}
@@ -197,15 +196,12 @@ public class JType_LabelProvider extends AbstractLabelDefinitionProvider
 	// @formatter:off
     return executeAll(
 
-        setLabelText(propertyValue("fqn")),
+        setLabelText(convertFieldSignature(propertyValue("fqn"))),
         setIsOverlayImage(true),
 
         when(nodeHasPropertyWithValue("visibility", "public")).then(setBaseImage(ICONS_FIELD_PUBLIC_OBJ_SVG)),
-
         when(nodeHasPropertyWithValue("visibility", "private")).then(setBaseImage(ICONS_FIELD_PRIVATE_OBJ_SVG)),
-
         when(nodeHasPropertyWithValue("visibility", "protected")).then(setBaseImage(ICONS_FIELD_PROTECTED_OBJ_SVG)),
-
         when(nodeHasPropertyWithValue("visibility", "default")).then(setBaseImage(ICONS_FIELD_DEFAULT_OBJ_SVG)));
     // @formatter:on
 	}
@@ -219,5 +215,9 @@ public class JType_LabelProvider extends AbstractLabelDefinitionProvider
 	 */
 	protected Function<HGNode, String> convertMethodSignature(Function<HGNode, String> function) {
 		return (node) -> this._methodSignatureParser.parse(function.apply(node));
+	}
+
+	protected Function<HGNode, String> convertFieldSignature(Function<HGNode, String> function) {
+		return (node) -> this._fieldSignatureParser.parse(function.apply(node));
 	}
 }

@@ -40,17 +40,17 @@ public interface JType_Constants {
 	  final String ICONS_CLASSF_OBJ_SVG = "icons/classf_obj.svg";
 
 	  // TODO!
-	  final String ICONS_FIELD_DEFAULT_OBJ_SVG = "icons/field_default_obj.png";
+	  final String ICONS_FIELD_DEFAULT_OBJ_SVG = "icons/field_default_obj.svg";
 
-	  final String ICONS_FIELD_PROTECTED_OBJ_SVG = "icons/field_protected_obj.png";
+	  final String ICONS_FIELD_PROTECTED_OBJ_SVG = "icons/field_protected_obj.svg";
 
-	  final String ICONS_FIELD_PRIVATE_OBJ_SVG = "icons/field_private_obj.png";
+	  final String ICONS_FIELD_PRIVATE_OBJ_SVG = "icons/field_private_obj.svg";
 
-	  final String ICONS_FIELD_PUBLIC_OBJ_SVG = "icons/field_public_obj.png";
+	  final String ICONS_FIELD_PUBLIC_OBJ_SVG = "icons/field_public_obj.svg";
 
-	  final String ICONS_METHDEF_OBJ_SVG = "icons/methdef_obj.png";
+	  final String ICONS_METHDEF_OBJ_SVG = "icons/methdef_obj.svg";
 
-	  final String ICONS_METHPUB_OBJ_SVG = "icons/methpub_obj.png";
+	  final String ICONS_METHPUB_OBJ_SVG = "icons/methpub_obj.svg";
 
 	  final String ICONS_FILE_OBJ_SVG = "icons/classf_obj.svg";
 

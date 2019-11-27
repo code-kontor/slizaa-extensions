@@ -84,6 +84,15 @@ public class JType_NodeComparator implements INodeComparator {
 
     //
     if (hasLabel(node1, node2, "Module")) {
+
+      // handle <<Missing Types>>
+      if ("<<Missing Types>>".equalsIgnoreCase(getProperty(node1, "name"))) {
+        return 1000;
+      }
+      if ("<<Missing Types>>".equalsIgnoreCase(getProperty(node1, "name"))) {
+        return -1000;
+      }
+
       return compareProperties(node1, node2, "name");
     }
 
@@ -116,14 +125,14 @@ public class JType_NodeComparator implements INodeComparator {
     return hasLabel(node1, label) && hasLabel(node2, label);
   }
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @param node
-   * @param label
-   * @return
-   */
+  private boolean hasProperty(Object node, String property) {
+    return ((GraphDbNodeSource) ((HGNode) node).getNodeSource()).getProperties().containsKey(property);
+  }
+
+  private String getProperty(Object node, String property) {
+    return ((GraphDbNodeSource) ((HGNode) node).getNodeSource()).getProperties().get(property);
+  }
+
   private int compareProperties(Object node1, Object node2, String property) {
 
     //

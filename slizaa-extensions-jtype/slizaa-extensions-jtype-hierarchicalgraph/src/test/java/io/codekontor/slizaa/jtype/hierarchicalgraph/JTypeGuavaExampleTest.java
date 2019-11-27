@@ -53,18 +53,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class JTypeGuavaExampleTest {
 
   @ClassRule
-  public static JTypeTestServerRule SERVER = new JTypeTestServerRule(
+  public static JTypeTestServerRule       SERVER = new JTypeTestServerRule(
       multipleBinaryMvnArtifacts(new String[] { "com.google.guava", "guava", "21.0" }));
 
   @ClassRule
   public static BoltClientConnectionRule  CLIENT = new BoltClientConnectionRule();
 
-  private static HGRootNode rootNode;
+  private static HGRootNode               rootNode;
+
+  private static ILabelDefinitionProvider labelDefinitionProvider;
 
   @BeforeClass
-  public static void init()  {
-    rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
-            .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
+  public static void init() {
+    rootNode = MappingFactory.createMappingServiceForStandaloneSetup().convert(new JType_Hierarchical_MappingProvider(),
+        CLIENT.getBoltClient(), null);
+
+    labelDefinitionProvider = rootNode.getExtension(ILabelDefinitionProvider.class);
+  }
+
+  @Test
+  public void testMissingTypesSortedToTheBottom() {
+
+    List<HGNode> nodes = HierarchicalGraphUtils.sorted(rootNode.getChildren());
+
+    // get the missing types node
+    HGNode missingTypesNode = nodes.get(nodes.size() - 1);
+    String label = labelDefinitionProvider.getLabelDefinition(missingTypesNode).getText();
+
+    // assert
+    assertThat(label).isEqualTo("<<Missing Types>>");
   }
 
   @Test
@@ -85,63 +102,103 @@ public class JTypeGuavaExampleTest {
 
     //
     List<HGNode> packageNodes = CLIENT.getBoltClient()
-            .syncExecCypherQuery("MATCH (:Package {fqn: 'com/google/common'})-[:CONTAINS]->(p:Package) RETURN id(p)")
-            .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()));
+        .syncExecCypherQuery("MATCH (:Package {fqn: 'com/google/common'})-[:CONTAINS]->(p:Package) RETURN id(p)")
+        .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()));
 
     //
     int[][] dependencies = GraphUtils.computeAdjacencyMatrix(packageNodes);
 
     //
-    assertThat(dependencies).isEqualTo(new int[][]{
-            {280, 66, 1, 18, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 3},
-            {0, 3911, 21, 275, 0, 0, 0, 0, 0, 0, 437, 0, 0, 0, 0, 12},
-            {0, 0, 72, 28, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0},
-            {0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 0, 0, 17, 34, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0},
-            {0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 12, 0, 6, 0, 0, 66, 0, 0, 0, 15, 0, 2, 5, 4, 0},
-            {0, 16, 1, 15, 2, 0, 0, 12, 3, 2, 29, 0, 0, 0, 0, 0},
-            {0, 0, 16, 10, 0, 0, 0, 0, 294, 0, 29, 0, 0, 0, 0, 1},
-            {0, 14, 4, 56, 0, 0, 0, 0, 9, 228, 75, 0, 0, 0, 0, 3},
-            {0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 499, 0, 0, 0, 0, 0},
-            {0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-            {0, 65, 2, 119, 0, 0, 0, 0, 0, 0, 109, 0, 816, 0, 0, 2},
-            {0, 24, 1, 20, 0, 0, 0, 0, 0, 0, 71, 0, 20, 482, 0, 0},
-            {0, 73, 1, 15, 0, 0, 0, 0, 0, 3, 46, 0, 0, 0, 224, 0},
-            {0, 0, 9, 18, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 75}
-    });
+    assertThat(dependencies).isEqualTo(new int[][] { { 280, 66, 1, 18, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 3 },
+        { 0, 3911, 21, 275, 0, 0, 0, 0, 0, 0, 437, 0, 0, 0, 0, 12 },
+        { 0, 0, 72, 28, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0 }, { 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 17, 34, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0 }, { 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        { 0, 12, 0, 6, 0, 0, 66, 0, 0, 0, 15, 0, 2, 5, 4, 0 }, { 0, 16, 1, 15, 2, 0, 0, 12, 3, 2, 29, 0, 0, 0, 0, 0 },
+        { 0, 0, 16, 10, 0, 0, 0, 0, 294, 0, 29, 0, 0, 0, 0, 1 },
+        { 0, 14, 4, 56, 0, 0, 0, 0, 9, 228, 75, 0, 0, 0, 0, 3 }, { 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 499, 0, 0, 0, 0, 0 },
+        { 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 65, 2, 119, 0, 0, 0, 0, 0, 0, 109, 0, 816, 0, 0, 2 },
+        { 0, 24, 1, 20, 0, 0, 0, 0, 0, 0, 71, 0, 20, 482, 0, 0 },
+        { 0, 73, 1, 15, 0, 0, 0, 0, 0, 3, 46, 0, 0, 0, 224, 0 },
+        { 0, 0, 9, 18, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 75 } });
   }
 
   @Test
-  public void testNodeComparator() {
+  public void testNodeComparatorForPackages() {
 
     //
     List<HGNode> packageNodes = CLIENT.getBoltClient()
-            .syncExecCypherQuery("MATCH (p:Package {fqn: 'com/google/common/base'}) RETURN id(p)")
-            .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()));
+        .syncExecCypherQuery("MATCH (p:Package {fqn: 'com/google/common/base'}) RETURN id(p)")
+        .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()));
 
     //
     assertThat(packageNodes).hasSize(1);
 
-    List<HGNode> children = packageNodes.get(0).getChildren();
+    List<HGNode> children = HierarchicalGraphUtils.sorted(packageNodes.get(0).getChildren());
+    List<String> labels = children.stream().map(child -> (labelDefinitionProvider.getLabelDefinition(child).getText()))
+        .collect(Collectors.toList());
 
-    // TODO: Test!
-    for (HGNode child : children) {
-      GraphDbNodeSource nodeSource = child.getNodeSource(GraphDbNodeSource.class).get();
-      System.out.println(nodeSource.getLabels() + " : " + nodeSource.getProperties());
-    }
+      assertThat(labels).containsExactly(
+      "internal",
+      "Absent.class",
+      "AbstractIterator.class",
+      "Ascii.class",
+      "CaseFormat.class",
+      "CharMatcher.class",
+      "Charsets.class",
+      "CommonMatcher.class",
+      "CommonPattern.class",
+      "Converter.class",
+      "Defaults.class",
+      "Enums.class",
+      "Equivalence.class",
+      "ExtraObjectsMethodsForWeb.class",
+      "FinalizablePhantomReference.class",
+      "FinalizableReference.class",
+      "FinalizableReferenceQueue.class",
+      "FinalizableSoftReference.class",
+      "FinalizableWeakReference.class",
+      "Function.class",
+      "FunctionalEquivalence.class",
+      "Functions.class",
+      "JdkPattern.class",
+      "Joiner.class",
+      "MoreObjects.class",
+      "Objects.class",
+      "Optional.class",
+      "PairwiseEquivalence.class",
+      "PatternCompiler.class",
+      "Platform.class",
+      "Preconditions.class",
+      "Predicate.class",
+      "Predicates.class",
+      "Present.class",
+      "SmallCharMatcher.class",
+      "Splitter.class",
+      "StandardSystemProperty.class",
+      "Stopwatch.class",
+      "Strings.class",
+      "Supplier.class",
+      "Suppliers.class",
+      "Throwables.class",
+      "Ticker.class",
+      "Utf8.class",
+      "Verify.class",
+      "VerifyException.class",
+      "package-info.class");
   }
 
   @Test
   public void testClass() {
 
     List<HGNode> typesNodes = CLIENT.getBoltClient()
-            .syncExecCypherQuery("MATCH (t:Type {fqn: 'com.google.common.base.Stopwatch'}) RETURN id(t)")
-            .list(record -> rootNode.lookupNode(record.get("id(t)").asLong()));
+        .syncExecCypherQuery("MATCH (t:Type {fqn: 'com.google.common.base.Stopwatch'}) RETURN id(t)")
+        .list(record -> rootNode.lookupNode(record.get("id(t)").asLong()));
 
     assertThat(typesNodes).hasSize(1);
 
-    List<HGNode> children = sorted(typesNodes.get(0).getChildren());
+    List<HGNode> children = HierarchicalGraphUtils.sorted(typesNodes.get(0).getChildren());
+    List<String> labels = children.stream().map(child -> (labelDefinitionProvider.getLabelDefinition(child).getText()))
+        .collect(Collectors.toList());
 
     ILabelDefinitionProvider labelDefinitionProvider = rootNode.getExtension(ILabelDefinitionProvider.class);
 

@@ -15,25 +15,51 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.codekontor.slizaa.jtype.hierarchicalgraph.parser;
+package io.codekontor.slizaa.jtype.hierarchicalgraph.signatureparser;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+public class ParserUtil {
 
-public class FieldSignatureParser {
 
-    public static final String pattern = "([^\\s]+) ([^\\s]+)";
+    public static String[] split(String value, String regex) {
 
-    private Pattern r = Pattern.compile(pattern);
-
-    public String parse(String line) {
-        Matcher m = r.matcher(line);
-        if (m.find()) {
-            String type = ParserUtil.simpleName(m.group(1));
-            String name = ParserUtil.simpleName(m.group(2));
-            return name + ": " + type;
-        } else {
-            return line;
+        //
+        if (value == null) {
+            return new String[0];
         }
+
+        //
+        value = value.trim();
+
+        //
+        if (value.length() == 0) {
+            return new String[0];
+        }
+
+        //
+        return value.split(regex);
+    }
+
+    /**
+     * <p>
+     * </p>
+     *
+     * @param name
+     * @return
+     */
+    public static String simpleName(String name) {
+
+        //
+        if (name == null) {
+            return name;
+        }
+
+        //
+        int lastIndex = name.lastIndexOf('.');
+        if (lastIndex != -1) {
+            return name.substring(lastIndex + 1, name.length());
+        }
+
+        //
+        return name;
     }
 }

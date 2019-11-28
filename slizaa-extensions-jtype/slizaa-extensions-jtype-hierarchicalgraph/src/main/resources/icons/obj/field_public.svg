@@ -3,5 +3,8 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 width="1000px" height="1000px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve">
-<polygon fill="#BABB41" points="0.828,500.666 500.165,1.333 999.5,500.666 500.165,1000 "/>
+<path fill="#52A46B" stroke="#000000" stroke-width="15" stroke-miterlimit="10" d="M499.336,180.333c-176.731,0-320,143.27-320,320
+	c0,176.731,143.269,320,320,320c176.73,0,320-143.269,320-320C819.336,323.603,676.066,180.333,499.336,180.333z M499.336,756.333
+	c-141.385,0-256-114.614-256-256c0-141.383,114.615-256,256-256s256,114.617,256,256
+	C755.336,641.719,640.721,756.333,499.336,756.333z"/>
 </svg>

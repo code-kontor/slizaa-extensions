@@ -23,8 +23,8 @@ import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.labelprovider.AbstractLabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.labelprovider.dsl.ILabelDefinitionProcessor;
-import io.codekontor.slizaa.jtype.hierarchicalgraph.parser.FieldSignatureParser;
-import io.codekontor.slizaa.jtype.hierarchicalgraph.parser.MethodSignatureParser;
+import io.codekontor.slizaa.jtype.hierarchicalgraph.signatureparser.FieldSignatureParser;
+import io.codekontor.slizaa.jtype.hierarchicalgraph.signatureparser.MethodSignatureParser;
 
 /**
  * <p>
@@ -33,53 +33,53 @@ import io.codekontor.slizaa.jtype.hierarchicalgraph.parser.MethodSignatureParser
  * @author Gerd W&uuml;therich (gerd@gerd-wuetherich.de)
  */
 public class JType_LabelProvider extends AbstractLabelDefinitionProvider
-		implements ILabelDefinitionProvider, JType_Constants {
+    implements ILabelDefinitionProvider, JType_Constants {
 
-	/** - */
-	private boolean _showFullyQualifiedName;
+  /** - */
+  private boolean                     _showFullyQualifiedName;
 
-	/** - */
-	private final MethodSignatureParser _methodSignatureParser;
+  /** - */
+  private final MethodSignatureParser _methodSignatureParser;
 
-	private final FieldSignatureParser _fieldSignatureParser;
+  private final FieldSignatureParser  _fieldSignatureParser;
 
-	/**
-	 * <p>
-	 * </p>
-	 *
-	 * @param showFullyQualifiedName
-	 */
-	public JType_LabelProvider(boolean showFullyQualifiedName) {
-		this._showFullyQualifiedName = showFullyQualifiedName;
+  /**
+   * <p>
+   * </p>
+   *
+   * @param showFullyQualifiedName
+   */
+  public JType_LabelProvider(boolean showFullyQualifiedName) {
+    this._showFullyQualifiedName = showFullyQualifiedName;
 
-		//
-		this._methodSignatureParser = new MethodSignatureParser();
-		this._fieldSignatureParser = new FieldSignatureParser();
-	}
+    //
+    this._methodSignatureParser = new MethodSignatureParser();
+    this._fieldSignatureParser = new FieldSignatureParser();
+  }
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected ILabelDefinitionProcessor createLabelDefinitionProcessor() {
+  /**
+   * {@inheritDoc}
+   */
+  @Override
+  protected ILabelDefinitionProcessor createLabelDefinitionProcessor() {
 
-	// @formatter:off
-		return exclusiveChoice().
+    // @formatter:off
+    return exclusiveChoice().
 
-        // Group
+    // Group
         when(nodeHasLabel("Group")).then(handleGroup()).
 
-		    // Module
-				when(nodeHasLabel("Module")).then(handleModule()).
+        // Module
+        when(nodeHasLabel("Module")).then(handleModule()).
 
-				// Package
-				when(nodeHasLabel("Directory")).then(handleDirectory()).
+        // Package
+        when(nodeHasLabel("Directory")).then(handleDirectory()).
 
-				// Resource
-				when(nodeHasLabel("Resource")).then(handleResource()).
+        // Resource
+        when(nodeHasLabel("Resource")).then(handleResource()).
 
-				// Type
-				when(nodeHasLabel("Type")).then(handleType()).
+        // Type
+        when(nodeHasLabel("Type")).then(handleType()).
 
         // Method
         when(nodeHasLabel("Method")).then(handleMethod()).
@@ -87,137 +87,147 @@ public class JType_LabelProvider extends AbstractLabelDefinitionProvider
         // Field
         when(nodeHasLabel("Field")).then(handleField()).
 
-				// all other nodes
-				otherwise(setBaseImage(ICONS_JAR_OBJ_SVG).and(setLabelText(propertyValue("fqn"))));
+        // all other nodes
+        otherwise(setBaseImage(ICONS_OBJ_JAR_SVG).and(setLabelText(propertyValue("fqn"))));
 
-		// @formatter:on
-	}
+    // @formatter:on
+  }
 
-	private ILabelDefinitionProcessor handleGroup() {
-		return setBaseImage(ICONS_FLDR_OBJ_SVG).and(setLabelText(propertyValue("name")));
-	}
+  private ILabelDefinitionProcessor handleGroup() {
+    return setBaseImage(ICONS_OBJ_FOLDER_SVG).and(setLabelText(propertyValue("name")));
+  }
 
-	/**
-	 * <p>
-	 * </p>
-	 *
-	 * @return
-	 */
-	protected ILabelDefinitionProcessor handleModule() {
-		return setBaseImage(ICONS_JAR_OBJ_SVG).and(setLabelText(propertyValue("name")));
-	}
+  /**
+   * <p>
+   * </p>
+   *
+   * @return
+   */
+  protected ILabelDefinitionProcessor handleModule() {
+    return setBaseImage(ICONS_OBJ_JAR_SVG).and(setLabelText(propertyValue("name")));
+  }
 
-	/**
-	 * <p>
-	 * </p>
-	 *
-	 * @return
-	 */
-	protected ILabelDefinitionProcessor handleDirectory() {
+  /**
+   * <p>
+   * </p>
+   *
+   * @return
+   */
+  protected ILabelDefinitionProcessor handleDirectory() {
 
-	// @formatter:off
-		return exclusiveChoice().
+    // @formatter:off
+    return exclusiveChoice().
 
-		// Packages
-		when(nodeHasLabel("Package")).then(setBaseImage(ICONS_PACKAGE_OBJ_SVG)
-				.and(setLabelText(propertyValue(this._showFullyQualifiedName ? "fqn" : "name", str -> str.replace('/', '.'))))).
+    // Packages
+        when(nodeHasLabel("Package")).then(setBaseImage(ICONS_OBJ_PACKAGE_SVG).and(
+            setLabelText(propertyValue(this._showFullyQualifiedName ? "fqn" : "name", str -> str.replace('/', '.')))))
+        .
 
-		// Directories
-		otherwise(setBaseImage(ICONS_FLDR_OBJ_SVG).and(setLabelText(propertyValue(this._showFullyQualifiedName ? "fqn" : "name"))));
-		// @formatter:on
-	}
+        // Directories
+        otherwise(setBaseImage(ICONS_OBJ_FOLDER_SVG)
+            .and(setLabelText(propertyValue(this._showFullyQualifiedName ? "fqn" : "name"))));
+    // @formatter:on
+  }
 
-	private ILabelDefinitionProcessor handleResource() {
+  private ILabelDefinitionProcessor handleResource() {
 
-	// @formatter:off
-		return executeAll(
-
-				exclusiveChoice().when(nodeHasLabel("ClassFile"))
-						.then(setBaseImage(ICONS_CLASSF_OBJ_SVG))
-						.otherwise(setBaseImage(ICONS_FILE_OBJ_SVG)),
-
-				setLabelText(propertyValue("name")));
-		// @formatter:on
-	}
-
-	/**
-	 * <p>
-	 * </p>
-	 *
-	 * @return
-	 */
-	protected ILabelDefinitionProcessor handleType() {
-
-	// @formatter:off
-		return executeAll(
-
-				setLabelText(propertyValue("name")),
-				setIsOverlayImage(true),
-
-/*				when(nodeHasProperty("final"))
-						.then(setOverlayImage(ICO, OverlayPosition.TOP_RIGHT)),*/
-
-				when(nodeHasLabel("Class")).then(setBaseImage(ICONS_CLASS_OBJ_SVG)),
-				when(nodeHasLabel("Annotation")).then(setBaseImage(ICONS_ANNOTATION_OBJ_SVG)),
-				when(nodeHasLabel("Enum")).then(setBaseImage(ICONS_ENUM_OBJ_SVG)),
-				when(nodeHasLabel("Interface")).then(setBaseImage(ICONS_INT_OBJ_SVG)));
-		// @formatter:on
-	}
-
-	/**
-	 * <p>
-	 * </p>
-	 *
-	 * @return
-	 */
-	protected ILabelDefinitionProcessor handleMethod() {
-
-	// @formatter:off
+    // @formatter:off
     return executeAll(
 
-        setLabelText(convertMethodSignature(propertyValue("fqn"))),
-        setIsOverlayImage(true),
+        exclusiveChoice().when(nodeHasLabel("ClassFile")).then(setBaseImage(ICONS_OBJ_CLASSFILE_SVG))
+            .otherwise(setBaseImage(ICONS_OBJ_FILE_SVG)),
 
-        when(nodeHasPropertyWithValue("visibility", "public")).then(setBaseImage(ICONS_METHPUB_OBJ_SVG)),
-        when(nodeHasPropertyWithValue("visibility", "private")).then(setBaseImage(ICONS_METHOD_PRIVATE_OBJ_SVG)),
-        when(nodeHasPropertyWithValue("visibility", "protected")).then(setBaseImage(ICONS_METHOD_PROTECTED_OBJ_SVG)),
-        when(nodeHasPropertyWithValue("visibility", "default")).then(setBaseImage(ICONS_METHDEF_OBJ_SVG)));
+        setLabelText(propertyValue("name")));
     // @formatter:on
-	}
+  }
 
-	/**
-	 * <p>
-	 * </p>
-	 *
-	 * @return
-	 */
-	protected ILabelDefinitionProcessor handleField() {
+  /**
+   * <p>
+   * </p>
+   *
+   * @return
+   */
+  protected ILabelDefinitionProcessor handleType() {
 
-	// @formatter:off
+    // @formatter:off
     return executeAll(
 
-        setLabelText(convertFieldSignature(propertyValue("fqn"))),
-        setIsOverlayImage(true),
+        setLabelText(propertyValue("name")), setIsOverlayImage(true),
 
-        when(nodeHasPropertyWithValue("visibility", "public")).then(setBaseImage(ICONS_FIELD_PUBLIC_OBJ_SVG)),
-        when(nodeHasPropertyWithValue("visibility", "private")).then(setBaseImage(ICONS_FIELD_PRIVATE_OBJ_SVG)),
-        when(nodeHasPropertyWithValue("visibility", "protected")).then(setBaseImage(ICONS_FIELD_PROTECTED_OBJ_SVG)),
-        when(nodeHasPropertyWithValue("visibility", "default")).then(setBaseImage(ICONS_FIELD_DEFAULT_OBJ_SVG)));
+        /*
+         * when(nodeHasProperty("final")) .then(setOverlayImage(ICO, OverlayPosition.TOP_RIGHT)),
+         */
+
+        when(nodeHasLabel("Class")).then(setBaseImage(ICONS_OBJ_CLASS_SVG)),
+        when(nodeHasLabel("Annotation")).then(setBaseImage(ICONS_OBJ_ANNOTATION_SVG)),
+        when(nodeHasLabel("Enum")).then(setBaseImage(ICONS_OBJ_ENUM_SVG)),
+        when(nodeHasLabel("Interface")).then(setBaseImage(ICONS_OBJ_INTERFACE_SVG)));
     // @formatter:on
-	}
+  }
 
-	/**
-	 * <p>
-	 * </p>
-	 *
-	 * @param function
-	 * @return
-	 */
-	protected Function<HGNode, String> convertMethodSignature(Function<HGNode, String> function) {
-		return (node) -> this._methodSignatureParser.parse(function.apply(node));
-	}
+  /**
+   * <p>
+   * </p>
+   *
+   * @return
+   */
+  protected ILabelDefinitionProcessor handleMethod() {
 
-	protected Function<HGNode, String> convertFieldSignature(Function<HGNode, String> function) {
-		return (node) -> this._fieldSignatureParser.parse(function.apply(node));
-	}
+    // @formatter:off
+    return executeAll(
+
+        setLabelText(convertMethodSignature(propertyValue("fqn"))), setIsOverlayImage(true),
+
+        when(nodeHasPropertyWithValue("visibility", "public")).then(setBaseImage(ICONS_OBJ_METHOD_PUBLIC_SVG)),
+        when(nodeHasPropertyWithValue("visibility", "private")).then(setBaseImage(ICONS_OBJ_METHOD_PRIVATE_SVG)),
+        when(nodeHasPropertyWithValue("visibility", "protected")).then(setBaseImage(ICONS_OBJ_METHOD_PROTECTED_SVG)),
+        when(nodeHasPropertyWithValue("visibility", "default")).then(setBaseImage(ICONS_OBJ_METHOD_DEFAULT_SVG)),
+
+        when(nodeHasLabel("Constructor")).then(setOverlayImage(ICONS_OVR_CONSTRUCTOR_SVG, OverlayPosition.TOP_RIGHT)),
+
+        when(nodeHasPropertyWithValue("static", "true"))
+            .then(setOverlayImage(ICONS_OVR_STATIC_SVG, OverlayPosition.TOP_RIGHT))
+
+    );
+    // @formatter:on
+  }
+
+  /**
+   * <p>
+   * </p>
+   *
+   * @return
+   */
+  protected ILabelDefinitionProcessor handleField() {
+
+    // @formatter:off
+    return executeAll(
+
+        setLabelText(convertFieldSignature(propertyValue("fqn"))), setIsOverlayImage(true),
+
+        when(nodeHasPropertyWithValue("visibility", "public")).then(setBaseImage(ICONS_OBJ_FIELD_PUBLIC_SVG)),
+        when(nodeHasPropertyWithValue("visibility", "private")).then(setBaseImage(ICONS_OBJ_FIELD_PRIVATE_SVG)),
+        when(nodeHasPropertyWithValue("visibility", "protected")).then(setBaseImage(ICONS_OBJ_FIELD_PROTECTED_SVG)),
+        when(nodeHasPropertyWithValue("visibility", "default")).then(setBaseImage(ICONS_OBJ_FIELD_DEFAULT_SVG)),
+
+        when(nodeHasPropertyWithValue("static", "true"))
+            .then(setOverlayImage(ICONS_OVR_STATIC_SVG, OverlayPosition.TOP_RIGHT)));
+
+    // @formatter:on
+  }
+
+  /**
+   * <p>
+   * </p>
+   *
+   * @param function
+   * @return
+   */
+  protected Function<HGNode, String> convertMethodSignature(Function<HGNode, String> function) {
+    return (node) -> this._methodSignatureParser.parse(function.apply(node));
+  }
+
+  protected Function<HGNode, String> convertFieldSignature(Function<HGNode, String> function) {
+    return (node) -> this._fieldSignatureParser.parse(function.apply(node));
+  }
 }

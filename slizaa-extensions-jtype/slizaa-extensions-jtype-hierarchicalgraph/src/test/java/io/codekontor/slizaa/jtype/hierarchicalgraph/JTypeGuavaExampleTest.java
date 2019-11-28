@@ -20,28 +20,24 @@
  */
 package io.codekontor.slizaa.jtype.hierarchicalgraph;
 
-import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.INodeSource;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.spi.INodeComparator;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
-import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
+import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
-import static org.assertj.core.api.Assertions.assertThat;
+import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
+import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalGraphUtils;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 
 /**
  * <p>
@@ -125,66 +121,27 @@ public class JTypeGuavaExampleTest {
   @Test
   public void testNodeComparatorForPackages() {
 
-    //
     List<HGNode> packageNodes = CLIENT.getBoltClient()
         .syncExecCypherQuery("MATCH (p:Package {fqn: 'com/google/common/base'}) RETURN id(p)")
         .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()));
 
-    //
     assertThat(packageNodes).hasSize(1);
 
     List<HGNode> children = HierarchicalGraphUtils.sorted(packageNodes.get(0).getChildren());
     List<String> labels = children.stream().map(child -> (labelDefinitionProvider.getLabelDefinition(child).getText()))
         .collect(Collectors.toList());
 
-      assertThat(labels).containsExactly(
-      "internal",
-      "Absent.class",
-      "AbstractIterator.class",
-      "Ascii.class",
-      "CaseFormat.class",
-      "CharMatcher.class",
-      "Charsets.class",
-      "CommonMatcher.class",
-      "CommonPattern.class",
-      "Converter.class",
-      "Defaults.class",
-      "Enums.class",
-      "Equivalence.class",
-      "ExtraObjectsMethodsForWeb.class",
-      "FinalizablePhantomReference.class",
-      "FinalizableReference.class",
-      "FinalizableReferenceQueue.class",
-      "FinalizableSoftReference.class",
-      "FinalizableWeakReference.class",
-      "Function.class",
-      "FunctionalEquivalence.class",
-      "Functions.class",
-      "JdkPattern.class",
-      "Joiner.class",
-      "MoreObjects.class",
-      "Objects.class",
-      "Optional.class",
-      "PairwiseEquivalence.class",
-      "PatternCompiler.class",
-      "Platform.class",
-      "Preconditions.class",
-      "Predicate.class",
-      "Predicates.class",
-      "Present.class",
-      "SmallCharMatcher.class",
-      "Splitter.class",
-      "StandardSystemProperty.class",
-      "Stopwatch.class",
-      "Strings.class",
-      "Supplier.class",
-      "Suppliers.class",
-      "Throwables.class",
-      "Ticker.class",
-      "Utf8.class",
-      "Verify.class",
-      "VerifyException.class",
-      "package-info.class");
+    assertThat(labels).containsExactly("internal", "Absent.class", "AbstractIterator.class", "Ascii.class",
+        "CaseFormat.class", "CharMatcher.class", "Charsets.class", "CommonMatcher.class", "CommonPattern.class",
+        "Converter.class", "Defaults.class", "Enums.class", "Equivalence.class", "ExtraObjectsMethodsForWeb.class",
+        "FinalizablePhantomReference.class", "FinalizableReference.class", "FinalizableReferenceQueue.class",
+        "FinalizableSoftReference.class", "FinalizableWeakReference.class", "Function.class",
+        "FunctionalEquivalence.class", "Functions.class", "JdkPattern.class", "Joiner.class", "MoreObjects.class",
+        "Objects.class", "Optional.class", "PairwiseEquivalence.class", "PatternCompiler.class", "Platform.class",
+        "Preconditions.class", "Predicate.class", "Predicates.class", "Present.class", "SmallCharMatcher.class",
+        "Splitter.class", "StandardSystemProperty.class", "Stopwatch.class", "Strings.class", "Supplier.class",
+        "Suppliers.class", "Throwables.class", "Ticker.class", "Utf8.class", "Verify.class", "VerifyException.class",
+        "package-info.class");
   }
 
   @Test
@@ -197,37 +154,44 @@ public class JTypeGuavaExampleTest {
     assertThat(typesNodes).hasSize(1);
 
     List<HGNode> children = HierarchicalGraphUtils.sorted(typesNodes.get(0).getChildren());
+
+    //
     List<String> labels = children.stream().map(child -> (labelDefinitionProvider.getLabelDefinition(child).getText()))
         .collect(Collectors.toList());
 
-    ILabelDefinitionProvider labelDefinitionProvider = rootNode.getExtension(ILabelDefinitionProvider.class);
+    assertThat(labels).containsExactly("Stopwatch$1", "abbreviate(TimeUnit): String", "chooseUnit(long): TimeUnit",
+        "createStarted(Ticker): Stopwatch", "createStarted(): Stopwatch", "createUnstarted(Ticker): Stopwatch",
+        "createUnstarted(): Stopwatch", "elapsedNanos: long", "isRunning: boolean", "startTick: long", "ticker: Ticker",
+        "Stopwatch(Ticker)", "Stopwatch()", "elapsed(TimeUnit): long", "elapsedNanos(): long", "isRunning(): boolean",
+        "reset(): Stopwatch", "start(): Stopwatch", "stop(): Stopwatch", "toString(): String");
 
-    // TODO: Test!
-    for (HGNode child : children) {
-      GraphDbNodeSource nodeSource = (GraphDbNodeSource) child.getNodeSource();
-      System.out.println(labelDefinitionProvider.getLabelDefinition(child).getText());
-      // System.out.println(nodeSource.getProperties());
-    }
-  }
+    // static
+    ILabelDefinitionProvider.ILabelDefinition labelDefinition = labelDefinitionProvider
+            .getLabelDefinition(children.get(1));
+    assertThat(labelDefinition.getText()).isEqualTo("abbreviate(TimeUnit): String");
+    assertThat(labelDefinition.getBaseImagePath()).isEqualTo(JType_Constants.ICONS_OBJ_METHOD_PRIVATE_SVG);
+    assertThat(labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.TOP_RIGHT))
+            .isEqualTo(JType_Constants.ICONS_OVR_STATIC_SVG);
 
-  // TODO: Copied from graphql node utils
-  private static List<HGNode> sorted(Collection<HGNode> nodes) {
-    if (nodes != null && !nodes.isEmpty()) {
-      HGRootNode rootNode = nodes.iterator().next().getRootNode();
-      INodeComparator nodeComparator = rootNode.getExtension(INodeComparator.class);
-      return nodes.stream().sorted(new Comparator<HGNode>() {
-        @Override
-        public int compare(HGNode node1, HGNode node2) {
-          int category1 = nodeComparator.category(node1);
-          int category2 = nodeComparator.category(node2);
-          if (category1 == category2) {
-            return nodeComparator.compare(node1, node2);
-          } else {
-            return category1 - category2;
-          }
-        }
-      }).collect(Collectors.toList());
-    }
-    return Collections.emptyList();
+    labelDefinition = labelDefinitionProvider
+            .getLabelDefinition(children.get(3));
+    assertThat(labelDefinition.getText()).isEqualTo("createStarted(Ticker): Stopwatch");
+    assertThat(labelDefinition.getBaseImagePath()).isEqualTo(JType_Constants.ICONS_OBJ_METHOD_PUBLIC_SVG);
+    assertThat(labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.TOP_RIGHT))
+            .isEqualTo(JType_Constants.ICONS_OVR_STATIC_SVG);
+
+    // check constructor
+    labelDefinition = labelDefinitionProvider
+            .getLabelDefinition(children.get(11));
+    assertThat(labelDefinition.getText()).isEqualTo("Stopwatch(Ticker)");
+    assertThat(labelDefinition.getBaseImagePath()).isEqualTo(JType_Constants.ICONS_OBJ_METHOD_DEFAULT_SVG);
+    assertThat(labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.TOP_RIGHT))
+        .isEqualTo(JType_Constants.ICONS_OVR_CONSTRUCTOR_SVG);
+
+    labelDefinition = labelDefinitionProvider.getLabelDefinition(children.get(12));
+    assertThat(labelDefinition.getText()).isEqualTo("Stopwatch()");
+    assertThat(labelDefinition.getBaseImagePath()).isEqualTo(JType_Constants.ICONS_OBJ_METHOD_DEFAULT_SVG);
+    assertThat(labelDefinition.getOverlayImagePath(ILabelDefinitionProvider.OverlayPosition.TOP_RIGHT))
+        .isEqualTo(JType_Constants.ICONS_OVR_CONSTRUCTOR_SVG);
   }
 }

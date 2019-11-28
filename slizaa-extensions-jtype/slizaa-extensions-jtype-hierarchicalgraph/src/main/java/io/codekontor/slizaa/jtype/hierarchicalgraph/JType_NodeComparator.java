@@ -52,9 +52,9 @@ public class JType_NodeComparator implements INodeComparator {
     if (hasLabel(element, "Type")) {
       return 10;
     } else if (hasLabel(element, "Field")) {
-      return 20;
+      return "true".equalsIgnoreCase(getProperty(element, "static")) ? 10 :30;
     } else if (hasLabel(element, "Method")) {
-      return 30;
+      return "true".equalsIgnoreCase(getProperty(element, "static")) ? 20 :40;
     }
 
     //

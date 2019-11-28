@@ -18,41 +18,46 @@
 package io.codekontor.slizaa.jtype.hierarchicalgraph;
 
 public interface JType_Constants {
-	
-	  final String ICONS_ANNOTATION_OBJ_SVG = "icons/annotation_obj.svg";
-	  
-	  final String ICONS_CLASS_OBJ_SVG = "icons/class_obj.svg";
-	  
-	  final String ICONS_ENUM_OBJ_SVG = "icons/enum_obj.svg";
-	  
-	  final String ICONS_FLDR_OBJ_SVG = "icons/fldr_obj.svg";
-	  
-	  final String ICONS_INT_OBJ_SVG = "icons/int_obj.svg";
-	  
-	  final String ICONS_JAR_OBJ_SVG = "icons/jar_obj.svg";
-	  
-	  final String ICONS_METHOD_PRIVATE_OBJ_SVG = "icons/methpri_obj.svg";
-	  
-	  final String ICONS_METHOD_PROTECTED_OBJ_SVG = "icons/methpro_obj.svg";
-	  
-	  final String ICONS_PACKAGE_OBJ_SVG = "icons/package_obj.svg";
-	  
-	  final String ICONS_CLASSF_OBJ_SVG = "icons/classf_obj.svg";
 
-	  // TODO!
-	  final String ICONS_FIELD_DEFAULT_OBJ_SVG = "icons/field_default_obj.svg";
+  final String ICONS_OBJ_JAR_SVG              = "icons/obj/jar.svg";
 
-	  final String ICONS_FIELD_PROTECTED_OBJ_SVG = "icons/field_protected_obj.svg";
+  final String ICONS_OBJ_FILE_SVG             = "icons/obj/file.svg";
 
-	  final String ICONS_FIELD_PRIVATE_OBJ_SVG = "icons/field_private_obj.svg";
+  final String ICONS_OBJ_FOLDER_SVG           = "icons/obj/folder.svg";
 
-	  final String ICONS_FIELD_PUBLIC_OBJ_SVG = "icons/field_public_obj.svg";
+  final String ICONS_OBJ_PACKAGE_SVG          = "icons/obj/package.svg";
 
-	  final String ICONS_METHDEF_OBJ_SVG = "icons/methdef_obj.svg";
+  final String ICONS_OBJ_CLASSFILE_SVG        = "icons/obj/classfile.svg";
 
-	  final String ICONS_METHPUB_OBJ_SVG = "icons/methpub_obj.svg";
+  final String ICONS_OBJ_ANNOTATION_SVG       = "icons/obj/annotation.svg";
 
-	  final String ICONS_FILE_OBJ_SVG = "icons/classf_obj.svg";
+  final String ICONS_OBJ_CLASS_SVG            = "icons/obj/class.svg";
 
+  final String ICONS_OBJ_ENUM_SVG             = "icons/obj/enum.svg";
 
+  final String ICONS_OBJ_INTERFACE_SVG        = "icons/obj/interface.svg";
+
+  final String ICONS_OBJ_METHOD_PUBLIC_SVG    = "icons/obj/method_public.svg";
+
+  final String ICONS_OBJ_METHOD_PROTECTED_SVG = "icons/obj/method_protected.svg";
+
+  final String ICONS_OBJ_METHOD_PRIVATE_SVG   = "icons/obj/method_private.svg";
+
+  final String ICONS_OBJ_METHOD_DEFAULT_SVG   = "icons/obj/method_default.svg";
+
+  final String ICONS_OBJ_FIELD_PUBLIC_SVG     = "icons/obj/field_public.svg";
+
+  final String ICONS_OBJ_FIELD_PROTECTED_SVG  = "icons/obj/field_protected.svg";
+
+  final String ICONS_OBJ_FIELD_PRIVATE_SVG    = "icons/obj/field_private.svg";
+
+  final String ICONS_OBJ_FIELD_DEFAULT_SVG    = "icons/obj/field_default.svg";
+
+  final String ICONS_OVR_STATIC_SVG           = "icons/ovr/static.svg";
+
+  final String ICONS_OVR_ABSTRACT_SVG         = "icons/ovr/abstract.svg";
+
+  final String ICONS_OVR_FINAL_SVG            = "icons/ovr/final.svg";
+
+  final String ICONS_OVR_CONSTRUCTOR_SVG      = "icons/ovr/constructor.svg";
 }

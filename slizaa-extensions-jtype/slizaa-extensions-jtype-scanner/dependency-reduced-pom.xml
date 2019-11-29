@@ -265,10 +265,10 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <io.codekontor.slizaa.core.version>1.0.0-SNAPSHOT</io.codekontor.slizaa.core.version>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <io.codekontor.slizaa.scanner.version>1.0.0-SNAPSHOT</io.codekontor.slizaa.scanner.version>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <io.codekontor.slizaa.core.version>1.0.0-SNAPSHOT</io.codekontor.slizaa.core.version>
   </properties>
 </project>
 

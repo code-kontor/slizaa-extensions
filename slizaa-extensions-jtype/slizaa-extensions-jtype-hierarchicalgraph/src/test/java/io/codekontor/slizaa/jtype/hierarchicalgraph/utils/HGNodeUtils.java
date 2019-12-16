@@ -27,11 +27,22 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.INodeSource;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.ILabelDefinitionProvider;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
 
 public class HGNodeUtils {
+
+  public static String toString(HGCoreDependency coreDependency) {
+
+    //
+    ILabelDefinitionProvider labelDefinitionProvider = coreDependency.getFrom().getRootNode().getExtension(ILabelDefinitionProvider.class);
+
+    //
+    return labelDefinitionProvider.getLabelDefinition(coreDependency.getFrom()).getText() + " -[" + coreDependency.getType() + "]-> " + labelDefinitionProvider.getLabelDefinition(coreDependency.getTo()).getText();
+  }
 
   /**
    * <p>

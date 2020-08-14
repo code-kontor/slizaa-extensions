@@ -23,18 +23,17 @@ package io.codekontor.slizaa.jtype.hierarchicalgraph;
 import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.Utilities;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.*;
 
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.Utilities;
+import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultDependencySet;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
 import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.HGNodeUtils;
 import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
@@ -59,12 +58,22 @@ public class ResolveAggregatedDependenciesTest {
   @ClassRule
   public static BoltClientConnectionRule CLIENT = new BoltClientConnectionRule();
 
-  @Test
-  public void testResolveProxyDependencies_1() {
+  private HGRootNode rootNode;
 
-    //
-    HGRootNode rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
-        .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
+  @Before
+  public void before() {
+    rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
+            .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
+  }
+
+  @After
+  public void after() {
+    rootNode = null;
+  }
+
+
+  @Test
+  public void testResolveIncomingDependencies() {
 
     assertThat(rootNode.getAccumulatedIncomingCoreDependencies()).hasSize(10493);
     rootNode.resolveIncomingProxyDependencies();
@@ -75,11 +84,18 @@ public class ResolveAggregatedDependenciesTest {
   }
 
   @Test
-  public void testResolveProxyDependencies_2() {
+  public void testResolveOutgoingDependencies() {
 
-    //
-    HGRootNode rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
-        .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
+    assertThat(rootNode.getAccumulatedOutgoingCoreDependencies()).hasSize(10493);
+    rootNode.resolveOutgoingProxyDependencies();
+    assertThat(rootNode.getAccumulatedOutgoingCoreDependencies()).hasSize(10493);
+
+    rootNode.getAccumulatedOutgoingCoreDependencies().stream().filter(dep -> dep instanceof HGProxyDependency)
+            .forEach(dep -> assertThat(((HGProxyDependency) dep).isResolved()).isTrue());
+  }
+
+  @Test
+  public void testResolveClassProxyDependencies() {
 
     long id = CLIENT.getBoltClient()
         .syncExecCypherQuery(
@@ -88,7 +104,11 @@ public class ResolveAggregatedDependenciesTest {
     HGNode node = rootNode.lookupNode(id);
 
     // Dump all accumulated outgoing core dependencies
-    List<String> coreDependencyList = node.getAccumulatedOutgoingCoreDependencies().stream().map(dep -> HGNodeUtils.toString(dep)).collect(Collectors.toList());
+    List<String> coreDependencyList = node.getAccumulatedOutgoingCoreDependencies().stream()
+            .sorted(Comparator.comparing(dep -> HGNodeUtils.toString(dep.getFrom())))
+            .map(dep -> HGNodeUtils.toString(dep))
+            .collect(Collectors.toList());
+
     assertThat(coreDependencyList).containsExactly(
         "GeneratorBase -[DEPENDS_ON]-> VersionUtil",
         "GeneratorBase -[DEPENDS_ON]-> DefaultPrettyPrinter",
@@ -118,104 +138,55 @@ public class ResolveAggregatedDependenciesTest {
       if (dep instanceof HGProxyDependency) {
         HGProxyDependency proxyDependency = ((HGProxyDependency) dep);
         assertThat(proxyDependency.isResolved()).isFalse();
-        proxyDependency.resolveProxyDependencies();
+        proxyDependency.resolve();
         assertThat(proxyDependency.isResolved()).isTrue();
       }
     });
+  }
 
+  @Test
+  @Ignore
+  public void testDependencySet() {
 
-    node.getAccumulatedOutgoingCoreDependencies().forEach(dep -> {
-      System.out.println(HGNodeUtils.toString(dep));
-      if (dep instanceof HGProxyDependency) {
-        HGProxyDependency proxyDependency = ((HGProxyDependency) dep);
-        proxyDependency.getAccumulatedCoreDependencies().forEach(d -> {
-          System.out.println(" - " + HGNodeUtils.toString(d));
-          d.getFrom().getAccumulatedOutgoingCoreDependencies().forEach(d2 -> System.out.println("   - " + HGNodeUtils.toString(d2)));
-        });
-      }
-    });
+    long id = CLIENT.getBoltClient()
+            .syncExecCypherQuery(
+                    "Match (t:Type) Where t.fqn = 'com.fasterxml.jackson.core.base.GeneratorBase' Return id(t)")
+            .single().get("id(t)").asLong();
+    HGNode node = rootNode.lookupNode(id);
 
-    // Dump all accumulated outgoing core dependencies
-    coreDependencyList = node.getAccumulatedOutgoingCoreDependencies().stream().map(dep -> HGNodeUtils.toString(dep)).collect(Collectors.toList());
-    assertThat(coreDependencyList).containsExactly(
-            "GeneratorBase -[DEPENDS_ON]-> VersionUtil",
-            "GeneratorBase -[DEPENDS_ON]-> DefaultPrettyPrinter",
-            "GeneratorBase -[DEPENDS_ON]-> JsonWriteContext",
-            "GeneratorBase -[DEPENDS_ON]-> DupDetector",
-            "GeneratorBase -[DEPENDS_ON]-> JsonGenerator$Feature",
-            "GeneratorBase -[DEPENDS_ON]-> TreeNode",
-            "GeneratorBase -[DEPENDS_ON]-> JsonStreamContext",
-            "GeneratorBase -[DEPENDS_ON]-> SerializableString",
-            "GeneratorBase -[DEPENDS_ON]-> ObjectCodec",
-            "GeneratorBase -[DEPENDS_ON]-> Base64Variant",
-            "GeneratorBase -[DEPENDS_ON]-> JsonGenerator",
-            "GeneratorBase -[DEPENDS_ON]-> PrettyPrinter",
-            "GeneratorBase -[DEPENDS_ON]-> Version",
-            "GeneratorBase -[DEPENDS_ON]-> java.lang.Object",
-            "GeneratorBase -[DEPENDS_ON]-> java.lang.String",
-            "GeneratorBase -[DEPENDS_ON]-> java.lang.Class",
-            "GeneratorBase -[DEPENDS_ON]-> java.lang.Integer",
-            "GeneratorBase -[DEPENDS_ON]-> java.lang.IllegalStateException",
-            "GeneratorBase -[DEPENDS_ON]-> java.lang.StringBuilder",
-            "GeneratorBase -[DEPENDS_ON]-> java.io.IOException",
-            "GeneratorBase -[DEPENDS_ON]-> java.io.InputStream"
-    );
+    DefaultDependencySet dependencySet = new DefaultDependencySet(node.getAccumulatedOutgoingCoreDependencies());
 
-    // Dump all CHILDREN accumulated outgoing core dependencies
-    System.out.println("Dump all CHILDREN accumulated outgoing core dependencies:");
-    node.getChildren().forEach(n -> {
-      System.out.println(n.getAccumulatedOutgoingCoreDependencies().size());
-      n.getAccumulatedOutgoingCoreDependencies().forEach(dep -> {
-        System.out.println(HGNodeUtils.toString(dep));
-      });
-    });
+    Set<HGNode> children = dependencySet.getFilteredNodeChildren(node, SourceOrTarget.SOURCE, false);
+    System.out.println(children.size());
 
-    /**
-    System.out.println("-------------------------------");
+    dependencySet.resolveAllProxyDependencies();
 
-    node.getAccumulatedOutgoingCoreDependencies().forEach(dep -> {
-      if (dep instanceof HGProxyDependency) {
-        HGProxyDependency proxyDependency = ((HGProxyDependency) dep);
-        proxyDependency.getCoreDependencies(SourceOrTarget.SOURCE).forEach(d -> {
-          System.out.println(" - " + HGNodeUtils.toString(d));
-        });
-      }
-    }); **/
+    children = dependencySet.getFilteredNodeChildren(node, SourceOrTarget.SOURCE, false);
+    System.out.println(children.size());
   }
 
   @Test
   public void testResolveAggregatedLibraries() {
 
-    //
-    HGRootNode rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
-        .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
-
-    //
-    int unresolvedCount = 0;
-
-    //
     for (HGCoreDependency dependency : rootNode.getAccumulatedIncomingCoreDependencies()) {
-
-      //
       if (dependency instanceof HGProxyDependency) {
-
         HGProxyDependency proxyDependency = (HGProxyDependency) dependency;
+        proxyDependency.resolve();
 
-        //
-        proxyDependency.resolveProxyDependencies();
-
-        //
-        if (proxyDependency.getAccumulatedCoreDependencies().size() == 0) {
-          unresolvedCount++;
-          System.out.println(HGNodeUtils.getProperties(proxyDependency.getFrom()).get("fqn") + " -"
-              + proxyDependency.getType() + "-> " + HGNodeUtils.getProperties(proxyDependency.getTo()).get("fqn"));
-        }
+//        if (proxyDependency.getAccumulatedCoreDependencies().size() == 0) {
+//          System.out.println(HGNodeUtils.getProperties(proxyDependency.getFrom()).get("fqn") + " -"
+//              + proxyDependency.getType() + "-> " + HGNodeUtils.getProperties(proxyDependency.getTo()).get("fqn"));
+//        }
       }
-
     }
 
     //
-    // assertThat(unresolvedCount).isEqualTo(0);
+    for (HGCoreDependency dependency : rootNode.getAccumulatedIncomingCoreDependencies()) {
+      if (dependency instanceof HGProxyDependency) {
+        HGProxyDependency proxyDependency = (HGProxyDependency) dependency;
+        assertThat(proxyDependency.isResolved()).isTrue();
+      }
+    }
   }
 
   @Test
@@ -231,7 +202,7 @@ public class ResolveAggregatedDependenciesTest {
             .collect(Collectors.toList());
 
     //
-    Utilities.resolveProxyDependencies(proxyDependencies, null);
+    Utilities.resolveProxyDependencies(proxyDependencies);
 
     //
     for (HGCoreDependency dependency : rootNode.getAccumulatedIncomingCoreDependencies()) {

@@ -44,6 +44,15 @@ public class HGNodeUtils {
     return labelDefinitionProvider.getLabelDefinition(coreDependency.getFrom()).getText() + " -[" + coreDependency.getType() + "]-> " + labelDefinitionProvider.getLabelDefinition(coreDependency.getTo()).getText();
   }
 
+  public static String toString(HGNode node) {
+
+    //
+    ILabelDefinitionProvider labelDefinitionProvider = node.getRootNode().getExtension(ILabelDefinitionProvider.class);
+
+    //
+    return labelDefinitionProvider.getLabelDefinition(node).getText();
+  }
+
   /**
    * <p>
    * </p>

@@ -54,9 +54,9 @@ public class JType_DependencyProvider extends AbstractQueryBasedDependencyProvid
             + "OR (n1:Method)-[rel:DEFINES_LOCAL_VARIABLE]->(ref:TypeReference) "
             + "OR (n1:Method)-[rel:USES_TYPE_CONSTANT]->(ref:TypeReference) "
             + "OR (n1:Method)-[rel:ANNOTATED_BY]->(ref:TypeReference) "
-            + "OR (n1:Method)-[rel:INVOKES_METHOD_FROM]->(ref:TypeReference) "
-            + "OR (n1:Method)-[rel:INVOKED_METHOD_RETURNS]->(ref:TypeReference) "
-            + "OR (n1:Method)-[rel:INVOKED_METHOD_HAS_PARAMETER]->(ref:TypeReference) "
+            // + "OR (n1:Method)-[rel:INVOKES_METHOD_FROM]->(ref:TypeReference) "
+            // + "OR (n1:Method)-[rel:INVOKED_METHOD_RETURNS]->(ref:TypeReference) "
+            // + "OR (n1:Method)-[rel:INVOKED_METHOD_HAS_PARAMETER]->(ref:TypeReference) "
             + "OR (n1:Method)-[rel:REFERENCES]->(ref:TypeReference) "
 
             + ") "

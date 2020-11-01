@@ -45,6 +45,8 @@ import java.util.List;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThat;
 
 /**
  * <p>
@@ -145,14 +147,14 @@ public class JTypeTestServerRule implements TestRule {
 
     private IGraphDb createGraphDatabase() {
 
-        ClassLoader classLoader = this.getClass().getClassLoader();
-
         //
         IGraphDbFactory graphDbFactory = new GraphDbFactory();
         IModelImporterFactory modelImporterFactory = new ModelImporterFactory();
         List<IParserFactory> parserFactories = Arrays.asList(new JTypeByteCodeParserFactory());
-        ICypherStatementRegistry cypherStatementRegistry = new CypherStatementRegistry(() -> CypherRegistryUtils.getCypherStatementsFromClasspath(classLoader));
+        ICypherStatementRegistry cypherStatementRegistry = new CypherStatementRegistry(() -> CypherRegistryUtils.getCypherStatementsFromClasspath(this.getClass().getClassLoader()));
 
+        assertThat(cypherStatementRegistry.getAllStatements()).isNotEmpty();
+        
         if (_databaseDirectory.list().length == 0) {
 
 
@@ -166,7 +168,7 @@ public class JTypeTestServerRule implements TestRule {
                     DefaultProgressMonitor.consoleLogger());
 
             //
-            executeWithThreadContextClassLoader(classLoader,
+            executeWithThreadContextClassLoader(this.getClass().getClassLoader(),
                     () -> modelImporter.parse(progressMonitor,
                             () -> graphDbFactory.newGraphDb(5001, _databaseDirectory).create()));
 

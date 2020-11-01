@@ -105,32 +105,32 @@ public class ResolveAggregatedDependenciesTest {
 
     // Dump all accumulated outgoing core dependencies
     List<String> coreDependencyList = node.getAccumulatedOutgoingCoreDependencies().stream()
-            .sorted(Comparator.comparing(dep -> HGNodeUtils.toString(dep.getFrom())))
+            .sorted(Comparator.comparing(dep -> HGNodeUtils.toString(dep.getTo())))
             .map(dep -> HGNodeUtils.toString(dep))
             .collect(Collectors.toList());
-
+    
     assertThat(coreDependencyList).containsExactly(
-        "GeneratorBase -[DEPENDS_ON]-> VersionUtil",
-        "GeneratorBase -[DEPENDS_ON]-> DefaultPrettyPrinter",
-        "GeneratorBase -[DEPENDS_ON]-> JsonWriteContext",
-        "GeneratorBase -[DEPENDS_ON]-> DupDetector",
-        "GeneratorBase -[DEPENDS_ON]-> JsonGenerator$Feature",
-        "GeneratorBase -[DEPENDS_ON]-> TreeNode",
-        "GeneratorBase -[DEPENDS_ON]-> JsonStreamContext",
-        "GeneratorBase -[DEPENDS_ON]-> SerializableString",
-        "GeneratorBase -[DEPENDS_ON]-> ObjectCodec",
-        "GeneratorBase -[DEPENDS_ON]-> Base64Variant",
-        "GeneratorBase -[DEPENDS_ON]-> JsonGenerator",
-        "GeneratorBase -[DEPENDS_ON]-> PrettyPrinter",
-        "GeneratorBase -[DEPENDS_ON]-> Version",
-        "GeneratorBase -[DEPENDS_ON]-> java.lang.Object",
-        "GeneratorBase -[DEPENDS_ON]-> java.lang.String",
-        "GeneratorBase -[DEPENDS_ON]-> java.lang.Class",
-        "GeneratorBase -[DEPENDS_ON]-> java.lang.Integer",
-        "GeneratorBase -[DEPENDS_ON]-> java.lang.IllegalStateException",
-        "GeneratorBase -[DEPENDS_ON]-> java.lang.StringBuilder",
-        "GeneratorBase -[DEPENDS_ON]-> java.io.IOException",
-        "GeneratorBase -[DEPENDS_ON]-> java.io.InputStream"
+		"GeneratorBase -[DEPENDS_ON]-> Base64Variant",
+		"GeneratorBase -[DEPENDS_ON]-> DefaultPrettyPrinter",
+		"GeneratorBase -[DEPENDS_ON]-> DupDetector",
+		"GeneratorBase -[DEPENDS_ON]-> JsonGenerator",
+		"GeneratorBase -[DEPENDS_ON]-> JsonGenerator$Feature",
+		"GeneratorBase -[DEPENDS_ON]-> JsonStreamContext",
+		"GeneratorBase -[DEPENDS_ON]-> JsonWriteContext",
+		"GeneratorBase -[DEPENDS_ON]-> ObjectCodec",
+		"GeneratorBase -[DEPENDS_ON]-> PrettyPrinter",
+		"GeneratorBase -[DEPENDS_ON]-> SerializableString",
+		"GeneratorBase -[DEPENDS_ON]-> TreeNode",
+		"GeneratorBase -[DEPENDS_ON]-> Version",
+		"GeneratorBase -[DEPENDS_ON]-> VersionUtil",
+		"GeneratorBase -[DEPENDS_ON]-> java.io.IOException",
+		"GeneratorBase -[DEPENDS_ON]-> java.io.InputStream",
+		"GeneratorBase -[DEPENDS_ON]-> java.lang.Class",
+		"GeneratorBase -[DEPENDS_ON]-> java.lang.IllegalStateException",
+		"GeneratorBase -[DEPENDS_ON]-> java.lang.Integer",
+		"GeneratorBase -[DEPENDS_ON]-> java.lang.Object",
+		"GeneratorBase -[DEPENDS_ON]-> java.lang.String",
+		"GeneratorBase -[DEPENDS_ON]-> java.lang.StringBuilder"
     );
 
     // resolve all outgoing proxy dependencies

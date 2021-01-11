@@ -19,12 +19,15 @@ package io.codekontor.slizaa.neo4j.importer.internal.parser;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.QueryExecutionException;
+
 import io.codekontor.slizaa.scanner.spi.parser.ICypherStatementExecutor;
 
 /**
@@ -49,13 +52,24 @@ public class CypherStatementExecutorAdapter implements ICypherStatementExecutor 
     this._graphDatabaseService = checkNotNull(graphDatabaseService);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   @Override
-  public IResult executeCypherStatement(String cypherStatement) {
-    org.neo4j.graphdb.Result result = this._graphDatabaseService.execute(checkNotNull(cypherStatement));
-    return new ResultAdapter(result);
+  public <T> T executeCypherStatement(String cypherStatement, Function<IResult, T> mappingFunction) {
+
+    checkNotNull(cypherStatement);
+
+    try {
+
+      if (mappingFunction != null) {
+        return _graphDatabaseService.executeTransactionally(cypherStatement, Collections.emptyMap(),
+            mappingFunction != null ? result -> mappingFunction.apply(new ResultAdapter(result)) : null);
+      }
+
+      _graphDatabaseService.executeTransactionally(cypherStatement);
+      return null;
+
+    } catch (QueryExecutionException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -97,14 +111,12 @@ public class CypherStatementExecutorAdapter implements ICypherStatementExecutor 
       }
       //
       else {
-        // TODO
-        throw new RuntimeException();
+        throw new RuntimeException("Expected single result, but result is empty.");
       }
 
       //
       if (this._result.hasNext()) {
-        // TODO
-        throw new RuntimeException();
+        throw new RuntimeException("Expected single result, but result contains several entries.");
       }
 
       //

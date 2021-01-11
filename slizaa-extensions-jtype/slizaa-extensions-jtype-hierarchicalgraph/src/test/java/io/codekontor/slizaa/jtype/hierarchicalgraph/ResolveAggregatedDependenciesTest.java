@@ -28,10 +28,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.junit.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.*;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGCoreDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGProxyDependency;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.SourceOrTarget;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.impl.Utilities;
 import io.codekontor.slizaa.hierarchicalgraph.core.selection.internal.DefaultDependencySet;
 import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
@@ -45,6 +53,7 @@ import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
  * @author Gerd W&uuml;therich (gerd@gerd-wuetherich.de)
  *
  */
+@Ignore
 public class ResolveAggregatedDependenciesTest {
 
   @ClassRule
@@ -63,7 +72,7 @@ public class ResolveAggregatedDependenciesTest {
   @Before
   public void before() {
     rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
-            .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
+            .convert(new JType_MappingProvider(), CLIENT.getBoltClient(), null);
   }
 
   @After
@@ -99,8 +108,9 @@ public class ResolveAggregatedDependenciesTest {
 
     long id = CLIENT.getBoltClient()
         .syncExecCypherQuery(
-            "Match (t:Type) Where t.fqn = 'com.fasterxml.jackson.core.base.GeneratorBase' Return id(t)")
-        .single().get("id(t)").asLong();
+            "Match (t:Type) Where t.fqn = 'com.fasterxml.jackson.core.base.GeneratorBase' Return id(t)",
+            result -> result.single().get("id(t)").asLong());
+    
     HGNode node = rootNode.lookupNode(id);
 
     // Dump all accumulated outgoing core dependencies
@@ -150,8 +160,9 @@ public class ResolveAggregatedDependenciesTest {
 
     long id = CLIENT.getBoltClient()
             .syncExecCypherQuery(
-                    "Match (t:Type) Where t.fqn = 'com.fasterxml.jackson.core.base.GeneratorBase' Return id(t)")
-            .single().get("id(t)").asLong();
+                    "Match (t:Type) Where t.fqn = 'com.fasterxml.jackson.core.base.GeneratorBase' Return id(t)",
+                    result -> result.single().get("id(t)").asLong());
+    
     HGNode node = rootNode.lookupNode(id);
 
     DefaultDependencySet dependencySet = new DefaultDependencySet(node.getAccumulatedOutgoingCoreDependencies());
@@ -194,7 +205,7 @@ public class ResolveAggregatedDependenciesTest {
 
     //
     HGRootNode rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
-            .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
+            .convert(new JType_MappingProvider(), CLIENT.getBoltClient(), null);
 
     List<HGProxyDependency> proxyDependencies = rootNode.getAccumulatedIncomingCoreDependencies().stream()
             .filter(dep -> dep instanceof HGProxyDependency)

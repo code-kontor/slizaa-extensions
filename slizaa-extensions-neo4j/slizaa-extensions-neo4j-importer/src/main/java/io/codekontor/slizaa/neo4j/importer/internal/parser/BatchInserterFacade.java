@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.neo4j.unsafe.batchinsert.BatchInserter;
-import org.neo4j.unsafe.batchinsert.BatchInserters;
+import org.neo4j.batchinsert.BatchInserter;
+import org.neo4j.batchinsert.BatchInserters;
+import org.neo4j.io.layout.DatabaseLayout;
+import org.neo4j.io.layout.Neo4jLayout;
+
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinition;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.filebased.IFile;
-import io.codekontor.slizaa.scanner.spi.parser.model.INode;
 import io.codekontor.slizaa.scanner.spi.parser.model.INode;
 import io.codekontor.slizaa.scanner.spi.parser.model.IRelationship;
 import io.codekontor.slizaa.scanner.spi.parser.model.Label;
@@ -80,9 +82,8 @@ public class BatchInserterFacade implements AutoCloseable {
     checkNotNull(storeDir);
     _storeDir = storeDir;
 
-    // TODO!
     try {
-      _batchInserter = BatchInserters.inserter(new File(_storeDir));
+      _batchInserter = BatchInserters.inserter(DatabaseLayout.ofFlat(new File(_storeDir, "data/databases/neo4j").toPath()));
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -93,11 +94,14 @@ public class BatchInserterFacade implements AutoCloseable {
     _directoriesMap = new HashMap<>();
   }
 
+  BatchInserter batchInserter() {
+    return _batchInserter;
+  }
+
   /**
    * <p>
    * </p>
-   * 
-   * @param batchInserter
+   *
    * @param contentDefinition
    * @return
    */

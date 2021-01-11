@@ -28,15 +28,15 @@ import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.spi.annotations.Sl
  *
  */
 @SlizaaMappingProvider
-public class JType_Hierarchical_MappingProvider extends DefaultMappingProvider {
+public class JType_MappingProvider extends DefaultMappingProvider {
 
-	public JType_Hierarchical_MappingProvider() {
+	public JType_MappingProvider() {
 
 		//
 		super(IMappingProviderMetadata.createMetadata("io.codekontor.slizaa.jtype.core.TypesOnly_HierarchicalPackages",
-				"Slizaa JType (types only, hierarchical packages)", null, null),
-				new JType_Hierarchical_HierarchyProvider(), new JType_DependencyProvider(),
-				new JType_LabelProvider(false), new JType_NodeComparator());
+				"Slizaa JType", null, null),
+				new JType_HierarchyProvider(), new JType_DependencyProvider(),
+				new JType_LabelProvider(true), new JType_NodeComparator());
 	}
 
 }

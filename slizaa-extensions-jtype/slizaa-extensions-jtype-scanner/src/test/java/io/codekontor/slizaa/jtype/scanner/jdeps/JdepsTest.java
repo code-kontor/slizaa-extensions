@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 import io.codekontor.slizaa.jtype.scanner.jdeps.internal.JavapWrapper;
 
@@ -99,21 +98,19 @@ public class JdepsTest {
   private void assertSameReferences(String fqn) {
 
     //
-    StatementResult statementResult = this._client.getBoltClient().syncExecCypherQuery(
+    this._client.getBoltClient().syncExecAndConsume(
         "Match (t:TYPE {fqn: $name})-[:DEPENDS_ON]->(tr:TYPE_REFERENCE) return tr.fqn",
-        Collections.singletonMap("name", fqn));
-
-    //
-    List<String> referencesDetectedBySlizaa = statementResult.list(record -> record.get(0).asString());
-
-    //
-    try {
-      assertThat(referencesDetectedBySlizaa)
-          .containsExactlyInAnyOrder(this._jDepsRule.getJdepAnalysis().get(fqn).toArray(new String[0]));
-    } catch (AssertionError e) {
-      JavapWrapper.doIt(this._jarFile.getAbsolutePath(), fqn);
-      throw e;
-    }
+        Collections.singletonMap("name", fqn),
+        result -> {
+          List<String> referencesDetectedBySlizaa = result.list(record -> record.get(0).asString());
+          try {
+            assertThat(referencesDetectedBySlizaa)
+                .containsExactlyInAnyOrder(this._jDepsRule.getJdepAnalysis().get(fqn).toArray(new String[0]));
+          } catch (AssertionError e) {
+            JavapWrapper.doIt(this._jarFile.getAbsolutePath(), fqn);
+            throw e;
+          }
+        });
   }
 
   @Parameters

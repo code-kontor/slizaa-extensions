@@ -31,7 +31,6 @@ import org.junit.ClassRule;
 import org.junit.Test;
 
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.hierarchicalgraph.core.algorithms.GraphUtils;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
 import io.codekontor.slizaa.hierarchicalgraph.core.model.HierarchicalGraphUtils;
@@ -61,7 +60,7 @@ public class JTypeGuavaExampleTest {
 
   @BeforeClass
   public static void init() {
-    rootNode = MappingFactory.createMappingServiceForStandaloneSetup().convert(new JType_Hierarchical_MappingProvider(),
+    rootNode = MappingFactory.createMappingServiceForStandaloneSetup().convert(new JType_MappingProvider(),
         CLIENT.getBoltClient(), null);
 
     labelDefinitionProvider = rootNode.getExtension(ILabelDefinitionProvider.class);
@@ -83,8 +82,8 @@ public class JTypeGuavaExampleTest {
   @Test
   public void testMissingNodes() {
 
-    List<Long> missingTypes = CLIENT.getBoltClient().syncExecCypherQuery("MATCH (t:MissingType) RETURN t")
-        .list(record -> record.get("t").asNode().id());
+    List<Long> missingTypes = CLIENT.getBoltClient().syncExecCypherQuery("MATCH (t:MissingType) RETURN t", 
+        result -> result.list(record -> record.get("t").asNode().id()));
 
     assertThat(missingTypes).hasSize(341);
     for (Long missingType : missingTypes) {
@@ -93,37 +92,39 @@ public class JTypeGuavaExampleTest {
     }
   }
 
-  @Test
-  public void testMatrix() {
-
-    //
-    List<HGNode> packageNodes = CLIENT.getBoltClient()
-        .syncExecCypherQuery("MATCH (:Package {fqn: 'com/google/common'})-[:CONTAINS]->(p:Package) RETURN id(p)")
-        .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()));
-
-    //
-    int[][] dependencies = GraphUtils.computeAdjacencyMatrix(packageNodes);
-
-    //
-    assertThat(dependencies).isEqualTo(new int[][] { { 280, 66, 1, 18, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 3 },
-        { 0, 3911, 21, 275, 0, 0, 0, 0, 0, 0, 437, 0, 0, 0, 0, 12 },
-        { 0, 0, 72, 28, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0 }, { 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 17, 34, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0 }, { 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-        { 0, 12, 0, 6, 0, 0, 66, 0, 0, 0, 15, 0, 2, 5, 4, 0 }, { 0, 16, 1, 15, 2, 0, 0, 12, 3, 2, 29, 0, 0, 0, 0, 0 },
-        { 0, 0, 16, 10, 0, 0, 0, 0, 294, 0, 29, 0, 0, 0, 0, 1 },
-        { 0, 14, 4, 56, 0, 0, 0, 0, 9, 228, 75, 0, 0, 0, 0, 3 }, { 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 499, 0, 0, 0, 0, 0 },
-        { 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 65, 2, 119, 0, 0, 0, 0, 0, 0, 109, 0, 816, 0, 0, 2 },
-        { 0, 24, 1, 20, 0, 0, 0, 0, 0, 0, 71, 0, 20, 482, 0, 0 },
-        { 0, 73, 1, 15, 0, 0, 0, 0, 0, 3, 46, 0, 0, 0, 224, 0 },
-        { 0, 0, 9, 18, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 75 } });
-  }
+//  @Test
+//  @Ignore
+//  public void testMatrix() {
+//
+//    //
+//    List<HGNode> packageNodes = CLIENT.getBoltClient()
+//        .syncExecCypherQuery("MATCH (p:Package) RETURN id(p)")
+//        .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()))
+//            .stream().filter(node -> node != null)
+//            .collect(Collectors.toList());
+//
+//    //
+//    int[][] dependencies = GraphUtils.computeAdjacencyMatrix(packageNodes);
+//
+//    //
+//    assertThat(dependencies).isEqualTo(new int[][] { { 280, 66, 1, 18, 0, 0, 0, 0, 0, 0, 50, 0, 0, 0, 0, 3 },
+//        { 0, 3911, 21, 275, 0, 0, 0, 0, 0, 0, 437, 0, 0, 0, 0, 12 },
+//        { 0, 0, 72, 28, 0, 0, 0, 0, 0, 0, 33, 0, 0, 0, 0, 0 }, { 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+//        { 0, 0, 0, 17, 34, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0 }, { 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+//        { 0, 12, 0, 6, 0, 0, 66, 0, 0, 0, 15, 0, 2, 5, 4, 0 }, { 0, 16, 1, 15, 2, 0, 0, 12, 3, 2, 29, 0, 0, 0, 0, 0 },
+//        { 0, 0, 16, 10, 0, 0, 0, 0, 294, 0, 29, 0, 0, 0, 0, 1 },
+//        { 0, 14, 4, 56, 0, 0, 0, 0, 9, 228, 75, 0, 0, 0, 0, 3 }, { 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 499, 0, 0, 0, 0, 0 },
+//        { 0, 0, 0, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, { 0, 65, 2, 119, 0, 0, 0, 0, 0, 0, 109, 0, 816, 0, 0, 2 },
+//        { 0, 24, 1, 20, 0, 0, 0, 0, 0, 0, 71, 0, 20, 482, 0, 0 },
+//        { 0, 73, 1, 15, 0, 0, 0, 0, 0, 3, 46, 0, 0, 0, 224, 0 },
+//        { 0, 0, 9, 18, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 75 } });
+//  }
 
   @Test
   public void testNodeComparatorForPackages() {
 
     List<HGNode> packageNodes = CLIENT.getBoltClient()
-        .syncExecCypherQuery("MATCH (p:Package {fqn: 'com/google/common/base'}) RETURN id(p)")
-        .list(record -> rootNode.lookupNode(record.get("id(p)").asLong()));
+            .syncExecCypherQuery("MATCH (p:Package {fqn: 'com/google/common/base'}) RETURN id(p)", result -> result.list(record -> rootNode.lookupNode(record.get("id(p)").asLong())));
 
     assertThat(packageNodes).hasSize(1);
 
@@ -131,7 +132,7 @@ public class JTypeGuavaExampleTest {
     List<String> labels = children.stream().map(child -> (labelDefinitionProvider.getLabelDefinition(child).getText()))
         .collect(Collectors.toList());
 
-    assertThat(labels).containsExactly("internal", "Absent.class", "AbstractIterator.class", "Ascii.class",
+    assertThat(labels).containsExactly("Absent.class", "AbstractIterator.class", "Ascii.class",
         "CaseFormat.class", "CharMatcher.class", "Charsets.class", "CommonMatcher.class", "CommonPattern.class",
         "Converter.class", "Defaults.class", "Enums.class", "Equivalence.class", "ExtraObjectsMethodsForWeb.class",
         "FinalizablePhantomReference.class", "FinalizableReference.class", "FinalizableReferenceQueue.class",
@@ -148,8 +149,7 @@ public class JTypeGuavaExampleTest {
   public void testClass() {
 
     List<HGNode> typesNodes = CLIENT.getBoltClient()
-        .syncExecCypherQuery("MATCH (t:Type {fqn: 'com.google.common.base.Stopwatch'}) RETURN id(t)")
-        .list(record -> rootNode.lookupNode(record.get("id(t)").asLong()));
+        .syncExecCypherQuery("MATCH (t:Type {fqn: 'com.google.common.base.Stopwatch'}) RETURN id(t)", result -> result.list(record -> rootNode.lookupNode(record.get("id(t)").asLong())));
 
     assertThat(typesNodes).hasSize(1);
 

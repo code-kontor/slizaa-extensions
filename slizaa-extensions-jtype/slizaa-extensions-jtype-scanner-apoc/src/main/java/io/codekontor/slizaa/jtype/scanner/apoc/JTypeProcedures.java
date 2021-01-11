@@ -23,57 +23,66 @@ import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.Result;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.procedure.Context;
 import org.neo4j.procedure.Mode;
 import org.neo4j.procedure.Procedure;
 
-import apoc.result.RelationshipResult;
-
 public class JTypeProcedures {
 
-    /** - */
-    @Context
-    public GraphDatabaseService _databaseService;
+  /** - */
+  @Context
+  public GraphDatabaseService _databaseService;
 
-    @Procedure(name = "slizaa.jtype.createMissingTypes", mode = Mode.WRITE)
-    public Stream<RelationshipResult> createMissingTypes() {
+  @Procedure(name = "slizaa.jtype.createMissingTypes", mode = Mode.WRITE)
+  public Stream<CreateMissingTypesResult> createMissingTypes() {
 
-        //
-        final MissingTypesCreator virtualPackageCreator = new MissingTypesCreator(this._databaseService);
+    try (Transaction transaction = this._databaseService.beginTx()) {
 
-        //
-        Result result = this._databaseService
-                .execute("MATCH (tref:TypeReference) WHERE NOT (tref)-[:BOUND_TO]->(:Type) RETURN tref, tref.fqn");
+      final MissingTypesCreator virtualPackageCreator = new MissingTypesCreator(transaction);
 
-        //
-        result.forEachRemaining(map -> {
+      Result result = transaction
+          .execute("MATCH (tref:TypeReference) WHERE NOT (tref)-[:BOUND_TO]->(:Type) RETURN tref, tref.fqn");
 
-            // get TypeReference and fqn
-            String typeReferenceFullyQualifiedName = map.get("tref.fqn").toString();
-            Node typeReferenceNode = (Node) map.get("tref");
+      result.forEachRemaining(map -> {
 
-            // byte, short, int, long, float, double, char, and boolean
-            if (typeReferenceFullyQualifiedName.equals("byte") || typeReferenceFullyQualifiedName.equals("short")
-                    || typeReferenceFullyQualifiedName.equals("int") || typeReferenceFullyQualifiedName.equals("long")
-                    || typeReferenceFullyQualifiedName.equals("float") || typeReferenceFullyQualifiedName.equals("double")
-                    || typeReferenceFullyQualifiedName.equals("char") || typeReferenceFullyQualifiedName.equals("boolean")) {
+        // get TypeReference and fqn
+        String typeReferenceFullyQualifiedName = map.get("tref.fqn").toString();
+        Node typeReferenceNode = (Node) map.get("tref");
 
-                //
-                throw new RuntimeException("" + typeReferenceNode.getAllProperties());
-            }
+        // byte, short, int, long, float, double, char, and boolean
+        if (typeReferenceFullyQualifiedName.equals("byte") || typeReferenceFullyQualifiedName.equals("short")
+            || typeReferenceFullyQualifiedName.equals("int") || typeReferenceFullyQualifiedName.equals("long")
+            || typeReferenceFullyQualifiedName.equals("float") || typeReferenceFullyQualifiedName.equals("double")
+            || typeReferenceFullyQualifiedName.equals("char") || typeReferenceFullyQualifiedName.equals("boolean")) {
 
-            //
-
-            try {
-                Node virtualTypeNode = virtualPackageCreator.getOrCreateVirtualType(typeReferenceFullyQualifiedName);
-                typeReferenceNode.createRelationshipTo(virtualTypeNode, RelationshipType.withName("BOUND_TO"));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        });
+          //
+          throw new RuntimeException("" + typeReferenceNode.getAllProperties());
+        }
 
         //
-        return Stream.of();
+
+        try {
+          Node virtualTypeNode = virtualPackageCreator.getOrCreateVirtualType(typeReferenceFullyQualifiedName);
+          typeReferenceNode.createRelationshipTo(virtualTypeNode, RelationshipType.withName("BOUND_TO"));
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+      });
+
+      transaction.commit();
+      
+      // TODO
+      return Stream.of(new CreateMissingTypesResult(1));
     }
+  }
+
+  public static class CreateMissingTypesResult {
+    public Long count;
+
+    public CreateMissingTypesResult(long count) {
+      this.count = count;
+    }
+    
+  }
 }

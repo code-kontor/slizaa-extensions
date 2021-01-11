@@ -78,7 +78,13 @@ public class JType_NodeComparator implements INodeComparator {
     }
 
     //
-    if (hasLabel(node1, node2, "Directory") || hasLabel(node1, node2, "Resource")) {
+    if (hasLabel(node1, node2, "Directory")) {
+      return compareProperties(node1, node2, "fqn");
+    }
+
+    
+    //
+    if (hasLabel(node1, node2, "Resource")) {
       return compareProperties(node1, node2, "name");
     }
 

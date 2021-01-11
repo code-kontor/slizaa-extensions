@@ -162,14 +162,14 @@ public class PrimitiveDatatypeNodeProvider implements IPrimitiveDatatypeNodeProv
       String primtiveDataType, JTypeLabel typeType) {
 
     //
-    IResult result = cypherStatementExecutor.executeCypherStatement(
-        String.format("MERGE (n:%s {fqn: '%s'}) RETURN id(n)", typeType.name(), primtiveDataType));
-
-    //
-    long nodeid = (long) result.single().get("id(n)");
-    INode nodeBean = NodeFactory.createNode(nodeid);
-    nodeBean.addLabel(typeType);
-    nodeBean.putProperty("fqn", primtiveDataType);
+    INode nodeBean = cypherStatementExecutor.executeCypherStatement(
+        String.format("MERGE (n:%s {fqn: '%s'}) RETURN id(n)", typeType.name(), primtiveDataType), result -> {
+          long nodeid = (long) result.single().get("id(n)");
+          INode newNode = NodeFactory.createNode(nodeid);
+          newNode.addLabel(typeType);
+          newNode.putProperty("fqn", primtiveDataType);
+          return newNode;
+        });
 
     //
     return nodeBean;

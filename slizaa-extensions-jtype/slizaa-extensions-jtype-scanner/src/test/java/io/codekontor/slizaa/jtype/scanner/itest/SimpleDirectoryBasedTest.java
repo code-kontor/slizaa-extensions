@@ -24,7 +24,6 @@ import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 import io.codekontor.slizaa.scanner.contentdefinition.FileBasedContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.AnalyzeMode;
@@ -46,9 +45,9 @@ public class SimpleDirectoryBasedTest {
   public void test() {
 
     //
-    StatementResult statementResult = this._client.getBoltClient()
-        .syncExecCypherQuery("Match (t:TYPE) return count(t)");
-    System.out.println(statementResult.single().get(0).asInt());
+    this._client.getBoltClient().syncExecAndConsume(
+        "Match (t:TYPE) return count(t)",
+        result -> System.out.println(result.single().get(0).asInt()));
   }
 
   /**

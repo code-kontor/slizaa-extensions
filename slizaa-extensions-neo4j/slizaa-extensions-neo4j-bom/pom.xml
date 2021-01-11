@@ -35,9 +35,8 @@
 	<packaging>pom</packaging>
 
 	<properties>
-		<neo4j-version>3.4.0</neo4j-version>
-		<neo4j-apoc-version>3.4.0.1</neo4j-apoc-version>
-		<neo4j-java-driver-version>1.5.1</neo4j-java-driver-version>
+		<neo4j-version>4.2.1</neo4j-version>
+		<neo4j-java-driver-version>4.2.0</neo4j-java-driver-version>
 	</properties>
 
 	<dependencyManagement>
@@ -56,6 +55,11 @@
 			<dependency>
 				<groupId>org.neo4j</groupId>
 				<artifactId>server-api</artifactId>
+				<version>${neo4j-version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-procedure</artifactId>
 				<version>${neo4j-version}</version>
 			</dependency>
 			<dependency>

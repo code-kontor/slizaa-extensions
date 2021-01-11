@@ -55,7 +55,7 @@ public class ModelImporterFactoryTest {
 
     //
     IModelImporter modelImporter = new ModelImporterFactory().createModelImporter(
-        (io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider) contentDefinitionProvider,
+        contentDefinitionProvider,
         databaseDirectory, Collections.emptyList(),
         Collections.emptyList());
 

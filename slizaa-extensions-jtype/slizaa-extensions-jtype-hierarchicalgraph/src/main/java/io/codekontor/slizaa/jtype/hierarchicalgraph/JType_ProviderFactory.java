@@ -24,7 +24,7 @@ public class JType_ProviderFactory implements IMappingProviderFactory {
 
 	@Override
 	public IMappingProvider createNewMappingProvider() {
-		return new JType_Hierarchical_MappingProvider();
+		return new JType_MappingProvider();
 	}
 
 	

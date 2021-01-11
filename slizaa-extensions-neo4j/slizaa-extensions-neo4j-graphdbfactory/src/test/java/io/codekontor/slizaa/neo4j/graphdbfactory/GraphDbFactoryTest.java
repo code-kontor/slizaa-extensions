@@ -19,10 +19,12 @@ package io.codekontor.slizaa.neo4j.graphdbfactory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
+import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 import io.codekontor.slizaa.neo4j.graphdbfactory.internal.GraphDbFactory;
 
 /**
@@ -33,10 +35,14 @@ import io.codekontor.slizaa.neo4j.graphdbfactory.internal.GraphDbFactory;
  */
 public class GraphDbFactoryTest {
 
+
+  @ClassRule
+  public static BoltClientConnectionRule client = new BoltClientConnectionRule("localhost", 5001);
+	
   /** - */
   @Rule
   public TemporaryFolder _temporaryFolder = new TemporaryFolder();
-
+  
   /**
    * <p>
    * </p>
@@ -50,5 +56,7 @@ public class GraphDbFactoryTest {
     
     //
     assertThat(graphDb).isNotNull();
+    
+    System.out.println(client.getBoltClient().getNodeLabels());
   }
 }

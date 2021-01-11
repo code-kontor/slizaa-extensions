@@ -19,37 +19,24 @@ package io.codekontor.slizaa.neo4j.graphdbfactory.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.neo4j.configuration.connectors.BoltConnector;
+import org.neo4j.configuration.connectors.BoltConnector.EncryptionLevel;
+import org.neo4j.configuration.helpers.SocketAddress;
+import org.neo4j.dbms.api.DatabaseManagementService;
+import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
 import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.neo4j.kernel.configuration.BoltConnector;
-import org.neo4j.kernel.configuration.Connector.ConnectorType;
-import org.neo4j.kernel.impl.proc.Procedures;
+import org.neo4j.kernel.api.procedure.GlobalProcedures;
 import org.neo4j.kernel.internal.GraphDatabaseAPI;
-import org.neo4j.logging.FormattedLogProvider;
+
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDbFactory;
-import io.codekontor.slizaa.neo4j.apoc.CreateDerived;
-import io.codekontor.slizaa.neo4j.apoc.SlizaaImportExportProcedures;
-import io.codekontor.slizaa.neo4j.apoc.arch.SlizaaArchProcedures;
-
-import apoc.create.Create;
 
 /**
  * <p>
@@ -59,7 +46,7 @@ import apoc.create.Create;
  */
 public class GraphDbFactory implements IGraphDbFactory {
 
-  private Supplier<List<Class<?>>> _databaseExtensionsSupplier;
+  private final Supplier<List<Class<?>>> _databaseExtensionsSupplier;
 
   /**
    * <p>
@@ -107,19 +94,19 @@ public class GraphDbFactory implements IGraphDbFactory {
   private class GraphDbBuilder implements IGraphDbBuilder {
 
     /** - */
-    private int                      _port;
+    private final int                      _port;
 
     /** - */
-    private File                     _storeDir;
+    private final File                     _storeDir;
 
     /** - */
-    private Object                   _userObject;
+    private Object                         _userObject;
 
     /** - */
-    private Map<String, Object>      _configuration = new HashMap<>();
+    private final Map<String, Object>      _configuration = new HashMap<>();
 
     /** - */
-    private Supplier<List<Class<?>>> _databaseExtensionsSupplier;
+    private final Supplier<List<Class<?>>> _databaseExtensionsSupplier;
 
     /**
      * <p>
@@ -167,35 +154,25 @@ public class GraphDbFactory implements IGraphDbFactory {
     @Override
     public IGraphDb create() {
 
-      //
-      GraphDatabaseFactory factory = new GraphDatabaseFactory();
-      factory.setUserLogProvider(FormattedLogProvider.toOutputStream(System.out));
-
-      //
-      GraphDatabaseService graphDatabase = null;
-
-      //
+      DatabaseManagementServiceBuilder databaseManagementServiceBuilder = new DatabaseManagementServiceBuilder(this._storeDir.toPath());
+      
       if (this._port != -1) {
-
-        //
-        BoltConnector bolt = new BoltConnector("0");
-        graphDatabase = factory.newEmbeddedDatabaseBuilder(this._storeDir)
-            .setConfig(bolt.type, ConnectorType.BOLT.name()).setConfig(bolt.enabled, "true")
-            .setConfig(bolt.listen_address, "localhost:" + this._port).setConfig(bolt.encryption_level, "DISABLED")
-            .newGraphDatabase();
+        databaseManagementServiceBuilder
+            .setConfig(BoltConnector.enabled, true).setConfig(BoltConnector.listen_address, new SocketAddress(this._port))
+            .setConfig(BoltConnector.encryption_level, EncryptionLevel.DISABLED);
       }
-      //
-      else {
-
-        //
-        graphDatabase = factory.newEmbeddedDatabaseBuilder(this._storeDir).newGraphDatabase();
-      }
+      
+      // configure slf4j logging
+      databaseManagementServiceBuilder.setUserLogProvider(new Slf4jLogProvider());
+      
+      DatabaseManagementService managementService = databaseManagementServiceBuilder.build();
+      GraphDatabaseService graphDatabase = managementService.database("neo4j");
 
       //
       registerDatabaseExtensions(graphDatabase);
 
       // the Neo4jGraphDb
-      return new Neo4jGraphDb(graphDatabase, this._port, this._userObject);
+      return new Neo4jGraphDb(managementService, graphDatabase, this._port, this._userObject);
     }
 
     /**
@@ -221,108 +198,83 @@ public class GraphDbFactory implements IGraphDbFactory {
         }
       }
 
-      // step 2: neo4j & slizaa-core apoc classess
+      // step 2: apoc classess
       extensionsToRegister.addAll(apocListClasses());
 
-      // step 3: neo4j & slizaa-core apoc classess
-      extensionsToRegister.addAll(coreApocClasses());
-
       //
-      for (Class<?> clazz : extensionsToRegister) {
-        System.out.println("Register extension class: " + clazz.getName());
-      }
+       for (Class<?> clazz : extensionsToRegister) {
+       System.out.println("Register extension class: " + clazz.getName());
+       }
 
       // get the procedure service
-      Procedures proceduresService = ((GraphDatabaseAPI) graphDatabase).getDependencyResolver()
-          .resolveDependency(Procedures.class);
+      GlobalProcedures globalProcedures = ((GraphDatabaseAPI) graphDatabase).getDependencyResolver()
+          .resolveDependency(GlobalProcedures.class);
 
       // register all elements
       for (Class<?> element : extensionsToRegister) {
         try {
-          proceduresService.registerFunction(element);
-          proceduresService.registerProcedure(element);
+          globalProcedures.registerFunction(element);
+          globalProcedures.registerProcedure(element);
         } catch (Exception e) {
           e.printStackTrace();
         }
       }
     }
-  }
 
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  private Collection<? extends Class<?>> apocListClasses() {
-
-    //
-    List<Class<?>> result = new ArrayList<Class<?>>();
-
-    //
-    ClassLoader classLoader = this.getClass().getClassLoader();
-
-    //
-    try {
+    /**
+     * <p>
+     * </p>
+     *
+     * @return
+     */
+    private Collection<? extends Class<?>> apocListClasses() {
 
       //
-      Enumeration<URL> apocLists = classLoader.getResources("apoc.list");
+      List<Class<?>> result = new ArrayList<Class<?>>();
 
-      if (apocLists != null) {
+      //
+      ClassLoader classLoader = this.getClass().getClassLoader();
+
+      //
+      try {
 
         //
-        while (apocLists.hasMoreElements()) {
+        Enumeration<URL> apocLists = classLoader.getResources("apoc.list");
 
-          URL url = apocLists.nextElement();
+        if (apocLists != null) {
 
           //
-          try (InputStream stream = url.openStream()) {
+          while (apocLists.hasMoreElements()) {
+
+            URL url = apocLists.nextElement();
 
             //
-            List<Class<?>> classesList = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
-                .lines().map(className -> {
-                  try {
-                    return classLoader.loadClass(className);
-                  } catch (Exception e) {
-                    return null;
-                  }
-                }).filter(v -> v != null).collect(Collectors.toList());
+            try (InputStream stream = url.openStream()) {
 
-            //
-            result.addAll(classesList);
+              //
+              List<Class<?>> classesList = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8))
+                  .lines().map(className -> {
+                    try {
+                      return classLoader.loadClass(className);
+                    } catch (Exception e) {
+                      return null;
+                    }
+                  }).filter(v -> v != null).collect(Collectors.toList());
+
+              //
+              result.addAll(classesList);
+            }
           }
         }
       }
+
+      //
+      catch (IOException e) {
+        // TODO
+        e.printStackTrace();
+      }
+
+      return result;
     }
-
-    //
-    catch (IOException e) {
-      // TODO
-      e.printStackTrace();
-    }
-
-    return result;
-  }
-
-  /**
-   * <p>
-   * </p>
-   *
-   * @return
-   */
-  private List<Class<?>> coreApocClasses() {
-
-    //
-    List<Class<?>> result = new ArrayList<Class<?>>();
-
-    // add neo4j apoc
-    result.add(Create.class);
-
-    // add slizaa apoc
-    result.add(SlizaaImportExportProcedures.class);
-    result.add(CreateDerived.class);
-    result.add(SlizaaArchProcedures.class);
-
-    return result;
   }
 }

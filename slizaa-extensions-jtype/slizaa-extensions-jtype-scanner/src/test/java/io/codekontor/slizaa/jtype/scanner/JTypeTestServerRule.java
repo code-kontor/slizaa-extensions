@@ -17,6 +17,20 @@
  */
 package io.codekontor.slizaa.jtype.scanner;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.rules.TestRule;
+import org.junit.runner.Description;
+import org.junit.runners.model.Statement;
+
 import io.codekontor.slizaa.core.progressmonitor.DefaultProgressMonitor;
 import io.codekontor.slizaa.jtype.scanner.bytecode.JTypeByteCodeParserFactory;
 import io.codekontor.slizaa.neo4j.graphdbfactory.internal.GraphDbFactory;
@@ -31,22 +45,6 @@ import io.codekontor.slizaa.scanner.cypherregistry.CypherStatementRegistry;
 import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
 import io.codekontor.slizaa.scanner.spi.parser.IParserFactory;
 import io.codekontor.slizaa.scanner.testfwk.internal.ZipUtil;
-import org.junit.rules.TestRule;
-import org.junit.runner.Description;
-import org.junit.runners.model.Statement;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertThat;
 
 /**
  * <p>
@@ -109,6 +107,7 @@ public class JTypeTestServerRule implements TestRule {
 
         if (!this._databaseDirectory.exists()) {
             this._databaseDirectory.mkdirs();
+            System.out.println("Database Directory: " + this._databaseDirectory);
         }
 
         return new Statement() {

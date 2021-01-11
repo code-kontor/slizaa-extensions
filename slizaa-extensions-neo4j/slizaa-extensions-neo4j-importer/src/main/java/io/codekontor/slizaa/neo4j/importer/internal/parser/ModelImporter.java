@@ -17,16 +17,32 @@
  */
 package io.codekontor.slizaa.neo4j.importer.internal.parser;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
+
+import org.neo4j.dbms.api.DatabaseManagementService;
+import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
+import org.neo4j.graphdb.GraphDatabaseService;
+import org.neo4j.graphdb.QueryExecutionException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.base.Stopwatch;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.QueryExecutionException;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import io.codekontor.slizaa.core.progressmonitor.IProgressMonitor;
 import io.codekontor.slizaa.core.progressmonitor.NullProgressMonitor;
 import io.codekontor.slizaa.neo4j.graphdbfactory.internal.GraphDbFactory;
@@ -43,16 +59,6 @@ import io.codekontor.slizaa.scanner.spi.parser.IParser;
 import io.codekontor.slizaa.scanner.spi.parser.IParserFactory;
 import io.codekontor.slizaa.scanner.spi.parser.IProblem;
 import io.codekontor.slizaa.scanner.spi.parser.model.INode;
-
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * <p>
@@ -112,7 +118,7 @@ public class ModelImporter implements IModelImporter {
    * Creates a new instance of type {@link ModelImporter}.
    * </p>
    */
-  public ModelImporter(IContentDefinitionProvider systemDefinition, File directory,
+  public ModelImporter(IContentDefinitionProvider<?> systemDefinition, File directory,
       List<IParserFactory> parserFactories, List<ICypherStatement> cypherStatements) {
 
     checkNotNull(systemDefinition);
@@ -130,7 +136,7 @@ public class ModelImporter implements IModelImporter {
   /**
    * {@inheritDoc}
    */
-  public final IContentDefinitionProvider getSystemDefinition() {
+  public final IContentDefinitionProvider<?> getSystemDefinition() {
     return this._contentDefinitions;
   }
 
@@ -314,8 +320,10 @@ public class ModelImporter implements IModelImporter {
     if (!this._parserFactories.isEmpty()) {
 
       //
-      GraphDatabaseService graphDatabaseService = new GraphDatabaseFactory()
-          .newEmbeddedDatabaseBuilder(getDatabaseDirectory()).newGraphDatabase();
+      DatabaseManagementService managementService = 
+    		  new DatabaseManagementServiceBuilder(getDatabaseDirectory().toPath()).build();
+      
+      GraphDatabaseService graphDatabaseService = managementService.database("neo4j");
 
       //
       IProgressMonitor subMonitor = progressMonitor.subTask("Start Batch Parse...")
@@ -336,7 +344,7 @@ public class ModelImporter implements IModelImporter {
       }
 
       //
-      graphDatabaseService.shutdown();
+      managementService.shutdown();
     }
   }
 
@@ -385,12 +393,7 @@ public class ModelImporter implements IModelImporter {
 
               //
               progressMonitor.subTask("Executing statement '" + cypherStatement.getFullyQualifiedName() + "'...");
-
-              //
-              try (Transaction transaction = graphDatabaseService.beginTx()) {
-                graphDatabaseService.execute(cypherStatement.getStatement());
-                transaction.success();
-              }
+              graphDatabaseService.executeTransactionally(cypherStatement.getStatement());
             }
           } catch (QueryExecutionException e) {
             e.printStackTrace();
@@ -402,7 +405,7 @@ public class ModelImporter implements IModelImporter {
     //
     if (shutdownDatabase) {
       progressMonitor.subTask("Shutdown graph database");
-      graphDatabaseService.shutdown();
+      this._graphDb.shutdown();
     }
   }
 

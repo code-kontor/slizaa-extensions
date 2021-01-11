@@ -23,16 +23,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.RelationshipType;
-import io.codekontor.slizaa.scanner.spi.parser.model.resource.CoreModelElementType;
-import io.codekontor.slizaa.scanner.spi.parser.model.resource.CoreModelRelationshipType;
+import org.neo4j.graphdb.Transaction;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+
+import io.codekontor.slizaa.scanner.spi.parser.model.resource.CoreModelElementType;
+import io.codekontor.slizaa.scanner.spi.parser.model.resource.CoreModelRelationshipType;
 
 /**
  * <p>
@@ -43,20 +44,20 @@ import com.google.common.cache.LoadingCache;
 public class MissingTypesCreator {
 
   // the Label 'MissingType'
-  private final Label LABEL_MISSING_TYPE = Label.label("MissingType");
+  private final Label                LABEL_MISSING_TYPE = Label.label("MissingType");
 
   // the Label 'Package'
-  private final Label LABEL_PACKAGE = Label.label("Package");
+  private final Label                LABEL_PACKAGE      = Label.label("Package");
 
   // the Label 'Directory'
-  private final Label LABEL_DIRECTORY = Label.label("Directory");
+  private final Label                LABEL_DIRECTORY    = Label.label("Directory");
 
   // the contains relationship
-  private final RelationshipType REL_CONTAINS = RelationshipType
-          .withName(CoreModelRelationshipType.CONTAINS.name());
+  private final RelationshipType     REL_CONTAINS       = RelationshipType
+      .withName(CoreModelRelationshipType.CONTAINS.name());
 
   /** - */
-  private GraphDatabaseService       _graphDatabaseService;
+  private Transaction                _transaction;
 
   /** - */
   private LoadingCache<String, Node> _virtualPackagesCache;
@@ -74,13 +75,13 @@ public class MissingTypesCreator {
    *
    * @param graphDatabaseService
    */
-  public MissingTypesCreator(GraphDatabaseService graphDatabaseService) {
+  public MissingTypesCreator(Transaction transaction) {
 
     //
-    this._graphDatabaseService = checkNotNull(graphDatabaseService);
+    this._transaction = checkNotNull(transaction);
 
     //
-    this._missingTypeModuleNode = this._graphDatabaseService
+    this._missingTypeModuleNode = this._transaction
         .createNode(Label.label(CoreModelElementType.Module.name()));
     this._missingTypeModuleNode.setProperty("fqn", "<<Missing Types>>");
     this._missingTypeModuleNode.setProperty("name", "<<Missing Types>>");
@@ -192,7 +193,7 @@ public class MissingTypesCreator {
   private Node createNode(Map<String, String> properties, Label... labels) {
 
     //
-    Node node = this._graphDatabaseService.createNode(labels);
+    Node node = this._transaction.createNode(labels);
 
     //
     for (Entry<String, String> entry : properties.entrySet()) {

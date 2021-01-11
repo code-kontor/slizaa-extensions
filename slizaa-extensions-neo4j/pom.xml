@@ -36,7 +36,6 @@
 
 	<modules>
 		<module>slizaa-extensions-neo4j-bom</module>
-		<module>slizaa-extensions-neo4j-apoc</module>
 		<module>slizaa-extensions-neo4j-graphdbfactory</module>
 		<module>slizaa-extensions-neo4j-importer</module>
 		<module>slizaa-extensions-neo4j</module>

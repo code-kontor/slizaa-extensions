@@ -35,11 +35,11 @@
         </encoder>
     </appender>
 
-    <root level="debug">
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
     </root>
 
-    <logger name="io.codekontor.slizaa.jtype.scanner.bytecode" level="DEBUG" >
+    <!-- logger name="io.codekontor.slizaa.jtype.scanner.bytecode" level="DEBUG" >
         <appender-ref ref="FILE" />
-    </logger>
+    </logger -->
 </configuration>

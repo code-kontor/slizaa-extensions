@@ -181,20 +181,8 @@
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <artifactId>slizaa-extensions-neo4j-apoc</artifactId>
-          <groupId>io.codekontor.slizaa.extensions</groupId>
-        </exclusion>
-        <exclusion>
           <artifactId>gson</artifactId>
           <groupId>com.google.code.gson</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>neo4j-bolt</artifactId>
-          <groupId>org.neo4j</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>apoc</artifactId>
-          <groupId>org.neo4j.procedure</groupId>
         </exclusion>
         <exclusion>
           <artifactId>neo4j</artifactId>
@@ -237,8 +225,14 @@
     <dependency>
       <groupId>org.neo4j.driver</groupId>
       <artifactId>neo4j-java-driver</artifactId>
-      <version>1.5.1</version>
+      <version>4.2.0</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>reactive-streams</artifactId>
+          <groupId>org.reactivestreams</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

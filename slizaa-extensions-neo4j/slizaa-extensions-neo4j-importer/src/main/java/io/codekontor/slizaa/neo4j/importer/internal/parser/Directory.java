@@ -33,7 +33,7 @@ import io.codekontor.slizaa.scanner.spi.contentdefinition.filebased.IFile;
 public class Directory {
 
   /** - */
-  private String          _path;
+  private String      _path;
 
   /** - */
   private List<IFile> _binaryResources;
@@ -42,7 +42,7 @@ public class Directory {
   private List<IFile> _sourceResources;
 
   /** - */
-  private int             _count = 0;
+  private int         _count = 0;
 
   /**
    * <p>
@@ -50,7 +50,7 @@ public class Directory {
    * </p>
    */
   public Directory(String path) {
-   checkNotNull(path);
+    checkNotNull(path);
 
     //
     _path = path;

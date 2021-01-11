@@ -25,7 +25,6 @@ import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 
 /**
@@ -47,13 +46,11 @@ public class CreateSampleDatabase {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void test() throws Exception {
 
     //
-    StatementResult statementResult = this._client.getBoltClient()
-        .syncExecCypherQuery("Match (t:Type) return count(t)");
-    assertThat(statementResult.single().get(0).asInt()).isEqualTo(1054);
+    int typeCount = this._client.getBoltClient().syncExecCypherQuery("Match (t:Type) return count(t)", result -> result.single().get(0).asInt());
+    assertThat(typeCount).isEqualTo(1054);
 
     //
     _server.exportDatabaseAsZipFile("mapstruct_1-2-0-Final-db.zip", false);

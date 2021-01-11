@@ -24,7 +24,6 @@ import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 
 public class PrimitiveDatatypeTest {
@@ -44,14 +43,13 @@ public class PrimitiveDatatypeTest {
   public void testPrimitiveDataType() {
 
     // check type references
-    StatementResult statementResult = this._client.getBoltClient()
-        .syncExecCypherQuery("MATCH (p:PrimitiveDataType) RETURN count(p)");
-    assertThat(statementResult.single().get("count(p)").asInt()).isEqualTo(8);
+    this._client.getBoltClient().syncExecAndConsume(
+        "MATCH (p:PrimitiveDataType) RETURN count(p)",
+        result -> assertThat(result.single().get("count(p)").asInt()).isEqualTo(8));
 
     //
-    statementResult = this._client.getBoltClient().syncExecCypherQuery(
-        "MATCH (t:TypeReference) WHERE t.fqn IN ['byte', 'short', 'int', 'long', 'float', 'double', 'char', 'boolean'] RETURN count(t)");
-    assertThat(statementResult.single().get("count(t)").asInt()).isEqualTo(0);
-
+    this._client.getBoltClient().syncExecAndConsume(
+        "MATCH (t:TypeReference) WHERE t.fqn IN ['byte', 'short', 'int', 'long', 'float', 'double', 'char', 'boolean'] RETURN count(t)",
+        result -> assertThat(result.single().get("count(t)").asInt()).isEqualTo(0));
   }
 }

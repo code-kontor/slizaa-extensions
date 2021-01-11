@@ -20,42 +20,41 @@ package io.codekontor.slizaa.jtype.scanner.apoc;
 import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.multipleBinaryMvnArtifacts;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import org.neo4j.driver.v1.StatementResult;
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 
 public class JTypeProceduresTest {
 
-    @ClassRule
-    public static JTypeTestServerRule _server = new JTypeTestServerRule(
-            multipleBinaryMvnArtifacts(new String[]{"com.netflix.eureka", "eureka-core", "1.8.2"},
-                    new String[]{"com.netflix.eureka", "eureka-client", "1.8.2"}));
-            //.withExtensionClass(JTypeProcedures.class);
+  @ClassRule
+  public static JTypeTestServerRule _server = new JTypeTestServerRule(
+      multipleBinaryMvnArtifacts(new String[] { "com.netflix.eureka", "eureka-core", "1.8.2" },
+          new String[] { "com.netflix.eureka", "eureka-client", "1.8.2" }));
 
-    @Rule
-    public BoltClientConnectionRule _client = new BoltClientConnectionRule();
+  @Rule
+  public BoltClientConnectionRule   _client = new BoltClientConnectionRule();
 
-    /**
-     * <p>
-     * </p>
-     */
-    @Test
-    public void testJTypeProcedures() {
+  /**
+   * <p>
+   * </p>
+   */
+  @Test
+  public void testJTypeProcedures() {
 
+    this._client.getBoltClient().syncExecCypherQuery("CALL slizaa.jtype.createMissingTypes()");
 
-        StatementResult statementResult = this._client.getBoltClient().syncExecCypherQuery("CALL slizaa.jtype.createMissingTypes()");
+    this._client.getBoltClient().syncExecAndConsume("Match(t:MissingType) return count(t) as count", result -> {
+      assertThat(result.single().get("count").asInt()).isEqualTo(904);
+    });
 
-        statementResult = this._client.getBoltClient().syncExecCypherQuery("Match(t:MissingType) return count(t) as count");
-        assertThat(statementResult.single().get("count").asInt()).isEqualTo(904);
-
-        statementResult = this._client.getBoltClient().syncExecCypherQuery("Match(t:MissingType) return t.name, t.fqn");
-        statementResult.forEachRemaining(r -> {
-                    assertThat(r.get("t.name").asString()).isNotEmpty();
-                    assertThat(r.get("t.fqn").asString()).isNotEmpty();
-                }
-        );
-    }
+    this._client.getBoltClient().syncExecAndConsume("Match(t:MissingType) return t.name, t.fqn", result -> {
+      result.forEachRemaining(r -> {
+        assertThat(r.get("t.name").asString()).isNotEmpty();
+        assertThat(r.get("t.fqn").asString()).isNotEmpty();
+      });
+    });
+  }
 }

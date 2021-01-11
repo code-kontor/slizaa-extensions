@@ -19,6 +19,7 @@ package io.codekontor.slizaa.neo4j.graphdbfactory.internal;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 
@@ -37,6 +38,9 @@ public class Neo4jGraphDb implements IGraphDb {
   private GraphDatabaseService _databaseService;
 
   /** - */
+  private DatabaseManagementService _databaseManagementService;
+
+  /** - */
   private int                  _port;
 
   /**
@@ -46,10 +50,11 @@ public class Neo4jGraphDb implements IGraphDb {
    *
    * @param databaseService
    * @param port
-   * @param slizaaProject
+   * @param userObject
    */
-  public Neo4jGraphDb(GraphDatabaseService databaseService, int port, Object userObject) {
+  public Neo4jGraphDb(DatabaseManagementService databaseManagementService, GraphDatabaseService databaseService, int port, Object userObject) {
     this._databaseService = checkNotNull(databaseService);
+    this._databaseManagementService = checkNotNull(databaseManagementService);
     this._port = port;
     this._userObject = userObject;
   }
@@ -88,12 +93,12 @@ public class Neo4jGraphDb implements IGraphDb {
    */
   @Override
   public void shutdown() {
-    this._databaseService.shutdown();
+    this._databaseManagementService.shutdown();
   }
 
   @Override
   public void close() throws Exception {
-    this._databaseService.shutdown();
+    this._databaseManagementService.shutdown();
   }
 
   public GraphDatabaseService getDatabaseService() {

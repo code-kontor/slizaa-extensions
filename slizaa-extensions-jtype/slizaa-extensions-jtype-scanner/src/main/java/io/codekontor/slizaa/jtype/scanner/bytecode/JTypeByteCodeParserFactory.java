@@ -66,12 +66,12 @@ public class JTypeByteCodeParserFactory extends IParserFactory.Adapter implement
       this._datatypeNodeProvider = new PrimitiveDatatypeNodeProvider(cypherStatementExecutor);
 
     //
-      cypherStatementExecutor.executeCypherStatement("create index on :Type(fqn)");
-      cypherStatementExecutor.executeCypherStatement("create index on :TypeReference(fqn)");
-      cypherStatementExecutor.executeCypherStatement("create index on :Field(fqn)");
-      cypherStatementExecutor.executeCypherStatement("create index on :FieldReference(fqn)");
-      cypherStatementExecutor.executeCypherStatement("create index on :Method(fqn)");
-      cypherStatementExecutor.executeCypherStatement("create index on :MethodReference(fqn)");
+      cypherStatementExecutor.executeCypherStatement("create index on :Type(fqn)", null);
+      cypherStatementExecutor.executeCypherStatement("create index on :TypeReference(fqn)", null);
+      cypherStatementExecutor.executeCypherStatement("create index on :Field(fqn)", null);
+      cypherStatementExecutor.executeCypherStatement("create index on :FieldReference(fqn)", null);
+      cypherStatementExecutor.executeCypherStatement("create index on :Method(fqn)", null);
+      cypherStatementExecutor.executeCypherStatement("create index on :MethodReference(fqn)", null);
   }
 
   /**

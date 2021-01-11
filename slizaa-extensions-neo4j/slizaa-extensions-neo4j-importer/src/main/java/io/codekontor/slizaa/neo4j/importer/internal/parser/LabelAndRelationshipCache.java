@@ -29,7 +29,7 @@ import com.google.common.cache.LoadingCache;
 public class LabelAndRelationshipCache {
 
   /** the instance */
-  private static LabelAndRelationshipCache                         _instance              = new LabelAndRelationshipCache();
+  private static LabelAndRelationshipCache       _instance              = new LabelAndRelationshipCache();
 
   /** - */
   private LoadingCache<String, Label>            _labelCache            = CacheBuilder.newBuilder()
@@ -76,7 +76,8 @@ public class LabelAndRelationshipCache {
     return result;
   }
 
-  public static RelationshipType convert(io.codekontor.slizaa.scanner.spi.parser.model.RelationshipType relationshipType) {
+  public static RelationshipType convert(
+      io.codekontor.slizaa.scanner.spi.parser.model.RelationshipType relationshipType) {
     return instance().getRelationship(relationshipType);
   }
 
@@ -91,7 +92,8 @@ public class LabelAndRelationshipCache {
     return _labelCache.getUnchecked(checkNotNull(slizaaLabel.name()));
   }
 
-  public RelationshipType getRelationship(io.codekontor.slizaa.scanner.spi.parser.model.RelationshipType relationshipType) {
+  public RelationshipType getRelationship(
+      io.codekontor.slizaa.scanner.spi.parser.model.RelationshipType relationshipType) {
     return _relationshipTypeCache.getUnchecked(checkNotNull(relationshipType.name()));
   }
 }

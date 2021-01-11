@@ -50,6 +50,10 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-procedure</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>io.codekontor.slizaa</groupId>
 			<artifactId>slizaa-scanner-spi-api</artifactId>
 			<version>${project.version}</version>
@@ -58,11 +62,6 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>server-api</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.neo4j.procedure</groupId>
-			<artifactId>apoc</artifactId>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

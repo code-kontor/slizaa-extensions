@@ -26,11 +26,11 @@ import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.neo4j.driver.v1.StatementResult;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 
 /**
-  */
+ * 
+ */
 public class SimpleJTypeMapStructTest {
 
   @ClassRule
@@ -50,9 +50,8 @@ public class SimpleJTypeMapStructTest {
   @Test
   public void test() throws Exception {
 
-    //
-    StatementResult statementResult = this._client.getBoltClient()
-        .syncExecCypherQuery("Match (t:Type) return count(t)");
-    assertThat(statementResult.single().get(0).asInt()).isEqualTo(148);
+    // 
+    this._client.getBoltClient()
+        .syncExecAndConsume("Match (t:Type) return count(t)", result -> assertThat(result.single().get(0).asInt()).isEqualTo(148));
   }
 }

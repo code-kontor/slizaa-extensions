@@ -20,26 +20,20 @@
  */
 package io.codekontor.slizaa.jtype.hierarchicalgraph;
 
-import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGNode;
-import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
-import io.codekontor.slizaa.hierarchicalgraph.graphdb.model.GraphDbNodeSource;
-import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.HGNodeUtils;
-import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
-import io.codekontor.slizaa.scanner.contentdefinition.DirectoryBasedContentDefinitionProvider;
-import io.codekontor.slizaa.scanner.contentdefinition.DirectoryBasedContentDefinitionProviderFactory;
-import io.codekontor.slizaa.scanner.spi.contentdefinition.IContentDefinitionProvider;
-import org.junit.ClassRule;
-import org.junit.Test;
+import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.directoryContent;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
-import static io.codekontor.slizaa.scanner.testfwk.ContentDefinitionProviderFactory.*;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.ClassRule;
+import org.junit.Test;
+
+import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
+import io.codekontor.slizaa.hierarchicalgraph.core.model.HGRootNode;
+import io.codekontor.slizaa.hierarchicalgraph.graphdb.mapping.service.MappingFactory;
+import io.codekontor.slizaa.jtype.hierarchicalgraph.utils.HGNodeUtils;
+import io.codekontor.slizaa.jtype.scanner.JTypeTestServerRule;
 
 /**
  * <p>
@@ -68,7 +62,7 @@ public class JTypeAdHocTest {
 
         //
         HGRootNode rootNode = MappingFactory.createMappingServiceForStandaloneSetup()
-                .convert(new JType_Hierarchical_MappingProvider(), CLIENT.getBoltClient(), null);
+                .convert(new JType_MappingProvider(), CLIENT.getBoltClient(), null);
 
         //
       try (FileWriter fileWriter = new FileWriter(new File(ROOT_DIR,"dump.txt"))) {
@@ -77,7 +71,7 @@ public class JTypeAdHocTest {
 
         //
         String query = "MATCH (t:Type)-[rel:IS_INNER_CLASS_DEFINED_BY]->(tr) return t, tr";
-        CLIENT.getBoltClient().syncExecCypherQuery(query)
-                .forEachRemaining(r -> System.out.println(r.get("t").asNode().asMap() + " => " + r.get("tr").asNode().asMap()));
+        CLIENT.getBoltClient().asyncExecAndConsume(query,
+            result -> result.forEachRemaining(r -> System.out.println(r.get("t").asNode().asMap() + " => " + r.get("tr").asNode().asMap())));
     }
 }

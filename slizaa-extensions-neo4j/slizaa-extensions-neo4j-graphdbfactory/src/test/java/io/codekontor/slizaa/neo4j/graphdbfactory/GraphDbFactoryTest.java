@@ -27,6 +27,8 @@ import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 import io.codekontor.slizaa.core.boltclient.testfwk.BoltClientConnectionRule;
 import io.codekontor.slizaa.neo4j.graphdbfactory.internal.GraphDbFactory;
 
+import java.io.File;
+
 /**
  * <p>
  * </p>
@@ -57,6 +59,19 @@ public class GraphDbFactoryTest {
     //
     assertThat(graphDb).isNotNull();
     
+    System.out.println(client.getBoltClient().getNodeLabels());
+  }
+
+  @Test
+  public void testCreateExisting() {
+
+    //
+    GraphDbFactory graphDbFactory = new GraphDbFactory();
+    IGraphDb graphDb = graphDbFactory.newGraphDb(5001, new File("C:\\Development\\slizaa\\repos\\slizaa\\slizaa-work\\databases\\masterFlitz")).create();
+
+    //
+    assertThat(graphDb).isNotNull();
+
     System.out.println(client.getBoltClient().getNodeLabels());
   }
 }

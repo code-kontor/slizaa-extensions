@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.graphdb.GraphDatabaseService;
+
 import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 
 /**
@@ -32,16 +33,25 @@ import io.codekontor.slizaa.scanner.api.graphdb.IGraphDb;
 public class Neo4jGraphDb implements IGraphDb {
 
   /** - */
-  private Object               _userObject;
+  private Object                    _userObject;
 
   /** - */
-  private GraphDatabaseService _databaseService;
+  private GraphDatabaseService      _databaseService;
 
   /** - */
   private DatabaseManagementService _databaseManagementService;
 
   /** - */
-  private int                  _port;
+  private int                       _port;
+
+  /** - */
+  private boolean                   _isInShutdown = false;
+
+  /** - */
+  private final Thread              shutdownHook  = new Thread(() -> {
+                                                    _isInShutdown = true;
+                                                    shutdown();
+                                                  });
 
   /**
    * <p>
@@ -52,11 +62,14 @@ public class Neo4jGraphDb implements IGraphDb {
    * @param port
    * @param userObject
    */
-  public Neo4jGraphDb(DatabaseManagementService databaseManagementService, GraphDatabaseService databaseService, int port, Object userObject) {
+  public Neo4jGraphDb(DatabaseManagementService databaseManagementService, GraphDatabaseService databaseService,
+      int port, Object userObject) {
     this._databaseService = checkNotNull(databaseService);
     this._databaseManagementService = checkNotNull(databaseManagementService);
     this._port = port;
     this._userObject = userObject;
+
+    Runtime.getRuntime().addShutdownHook(shutdownHook);
   }
 
   @SuppressWarnings("unchecked")
@@ -94,11 +107,14 @@ public class Neo4jGraphDb implements IGraphDb {
   @Override
   public void shutdown() {
     this._databaseManagementService.shutdown();
+    if (!_isInShutdown) {
+      Runtime.getRuntime().removeShutdownHook(shutdownHook);
+    }
   }
 
   @Override
   public void close() throws Exception {
-    this._databaseManagementService.shutdown();
+    shutdown();
   }
 
   public GraphDatabaseService getDatabaseService() {

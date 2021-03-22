@@ -26,8 +26,10 @@ import java.util.*;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.neo4j.configuration.GraphDatabaseInternalSettings;
 import org.neo4j.configuration.connectors.BoltConnector;
 import org.neo4j.configuration.connectors.BoltConnector.EncryptionLevel;
+import org.neo4j.configuration.connectors.HttpConnector;
 import org.neo4j.configuration.helpers.SocketAddress;
 import org.neo4j.dbms.api.DatabaseManagementService;
 import org.neo4j.dbms.api.DatabaseManagementServiceBuilder;
@@ -154,17 +156,19 @@ public class GraphDbFactory implements IGraphDbFactory {
     @Override
     public IGraphDb create() {
 
-      DatabaseManagementServiceBuilder databaseManagementServiceBuilder = new DatabaseManagementServiceBuilder(this._storeDir.toPath());
-      
+      DatabaseManagementServiceBuilder databaseManagementServiceBuilder = new DatabaseManagementServiceBuilder(
+          this._storeDir.toPath());
+
       if (this._port != -1) {
-        databaseManagementServiceBuilder
-            .setConfig(BoltConnector.enabled, true).setConfig(BoltConnector.listen_address, new SocketAddress(this._port))
-            .setConfig(BoltConnector.encryption_level, EncryptionLevel.DISABLED);
+        databaseManagementServiceBuilder.setConfig(BoltConnector.enabled, true)
+            .setConfig(BoltConnector.listen_address, new SocketAddress(this._port))
+            .setConfig(BoltConnector.encryption_level, EncryptionLevel.DISABLED)
+            .setConfig(HttpConnector.enabled, false);
       }
-      
+
       // configure slf4j logging
       databaseManagementServiceBuilder.setUserLogProvider(new Slf4jLogProvider());
-      
+
       DatabaseManagementService managementService = databaseManagementServiceBuilder.build();
       GraphDatabaseService graphDatabase = managementService.database("neo4j");
 
@@ -202,9 +206,9 @@ public class GraphDbFactory implements IGraphDbFactory {
       extensionsToRegister.addAll(apocListClasses());
 
       //
-       for (Class<?> clazz : extensionsToRegister) {
-       System.out.println("Register extension class: " + clazz.getName());
-       }
+      for (Class<?> clazz : extensionsToRegister) {
+        System.out.println("Register extension class: " + clazz.getName());
+      }
 
       // get the procedure service
       GlobalProcedures globalProcedures = ((GraphDatabaseAPI) graphDatabase).getDependencyResolver()

@@ -41,7 +41,6 @@ public class GraphDbFactoryTest {
   @ClassRule
   public static BoltClientConnectionRule client = new BoltClientConnectionRule("localhost", 5001);
 	
-  /** - */
   @Rule
   public TemporaryFolder _temporaryFolder = new TemporaryFolder();
   
@@ -52,26 +51,11 @@ public class GraphDbFactoryTest {
   @Test
   public void testGraphDbFactory() {
 
-    //
     GraphDbFactory graphDbFactory = new GraphDbFactory();
     IGraphDb graphDb = graphDbFactory.newGraphDb(5001, _temporaryFolder.getRoot()).create();
     
-    //
-    assertThat(graphDb).isNotNull();
-    
-    System.out.println(client.getBoltClient().getNodeLabels());
-  }
-
-  @Test
-  public void testCreateExisting() {
-
-    //
-    GraphDbFactory graphDbFactory = new GraphDbFactory();
-    IGraphDb graphDb = graphDbFactory.newGraphDb(5001, new File("C:\\Development\\slizaa\\repos\\slizaa\\slizaa-work\\databases\\masterFlitz")).create();
-
-    //
     assertThat(graphDb).isNotNull();
 
-    System.out.println(client.getBoltClient().getNodeLabels());
+    graphDb.shutdown();
   }
 }

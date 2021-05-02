@@ -22,7 +22,7 @@ ARG SLIZAA_JTYPE_VERSION
 
 ENV JAVA_APP_DIR /opt/slizaa
 ENV JAVA_MAJOR_VERSION 11
-ENV JAVA_APP_JAR slizaa-web-${SLIZAA_JTYPE_VERSION}.jar
+ENV JAVA_APP_JAR slizaa-web.jar
 ENV JAVA_APP_NAME SlizaaServer
 
 USER root
@@ -31,6 +31,8 @@ RUN addgroup -S slizaa && adduser -S slizaa -G slizaa
 ADD target/slizaa_${SLIZAA_JTYPE_VERSION}.tar.gz ${JAVA_APP_DIR}/
 RUN mv "${JAVA_APP_DIR}"/slizaa_${SLIZAA_JTYPE_VERSION}/* "${JAVA_APP_DIR}" && \
   rmdir "${JAVA_APP_DIR}"/slizaa_${SLIZAA_JTYPE_VERSION}
+RUN mv "${JAVA_APP_DIR}"/slizaa-web-*.jar "${JAVA_APP_DIR}"/slizaa-web.jar
+
 ADD target/docker-extra/run-java/run-java.sh  ${JAVA_APP_DIR}/
 
 RUN mkdir "${JAVA_APP_DIR}"/content

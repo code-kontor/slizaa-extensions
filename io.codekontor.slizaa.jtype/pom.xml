@@ -139,8 +139,12 @@
                                 <configuration>
                                     <target>
                                         <echo>Push to registry...</echo>
+                                        <exec executable="bash">
+                                            <arg value="-c"/>
+                                            <arg line="echo ${REGISTRY_PASSWORD} | docker login docker.pkg.github.com -u ${REGISTRY_USERNAME} --password-stdin"/>
+                                        </exec>
                                         <exec executable="docker">
-                                            <arg line="login docker.pkg.github.com -u test -p test"/>
+                                            <arg line="push docker.pkg.github.com/code-kontor/slizaa/${project.artifactId}:${project.version}"/>
                                         </exec>
                                     </target>
                                 </configuration>

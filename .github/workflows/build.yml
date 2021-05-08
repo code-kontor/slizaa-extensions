@@ -31,5 +31,5 @@ jobs:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-          registry.username: ${{ secrets.USER_PACKAGE_REGISTRY }}
-          registry.password: ${{ secrets.PAT_PACKAGE_REGISTRY }}
+          REGISTRY_USERNAME: ${{ secrets.USER_PACKAGE_REGISTRY }}
+          REGISTRY_PASSWORD: ${{ secrets.PAT_PACKAGE_REGISTRY }}

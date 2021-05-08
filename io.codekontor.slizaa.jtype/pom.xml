@@ -143,7 +143,7 @@
                                 </goals>
                                 <configuration>
                                     <filter>code-kontor/slizaa/${project.artifactId}:${project.version}</filter>
-                                    <pushRegistry>ghcr.io</pushRegistry>
+                                    <pushRegistry>docker.pkg.github.com</pushRegistry>
                                     <skipTag>true</skipTag>
                                 </configuration>
                             </execution>

@@ -138,11 +138,12 @@
                                 <phase>deploy</phase>
                                 <configuration>
                                     <target>
-                                        <echo>Push to registry...</echo>
-                                        <exec executable="bash">
-                                            <arg value="-c"/>
-                                            <arg line="echo ${REGISTRY_PASSWORD} | docker login docker.pkg.github.com -u ${REGISTRY_USERNAME} --password-stdin"/>
+                                        <echo>Preparing...</echo>
+                                        <exec executable="docker" inputstring="${REGISTRY_PASSWORD}">
+                                            <arg line="login docker.pkg.github.com -u ${REGISTRY_USERNAME} --password-stdin"/>
                                         </exec>
+
+                                        <echo>Pushing to registry...</echo>
                                         <exec executable="docker">
                                             <arg line="push docker.pkg.github.com/code-kontor/slizaa/${project.artifactId}:${project.version}"/>
                                         </exec>

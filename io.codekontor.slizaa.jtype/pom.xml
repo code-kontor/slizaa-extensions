@@ -103,7 +103,7 @@
                                 <configuration>
                                     <images>
                                         <image>
-                                            <name>code-kontor/slizaa/${project.artifactId}:${project.version}</name>
+                                            <name>docker.pkg.github.com/code-kontor/slizaa/${project.artifactId}</name>
                                             <build>
                                                 <contextDir>${project.basedir}</contextDir>
                                                 <args>
@@ -142,7 +142,7 @@
                                     <goal>push</goal>
                                 </goals>
                                 <configuration>
-                                    <filter>code-kontor/slizaa/${project.artifactId}:${project.version}</filter>
+                                    <filter>docker.pkg.github.com/code-kontor/slizaa/${project.artifactId}:${project.version}</filter>
                                     <pushRegistry>docker.pkg.github.com</pushRegistry>
                                     <skipTag>true</skipTag>
                                 </configuration>

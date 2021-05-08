@@ -144,6 +144,7 @@
                                 <configuration>
                                     <filter>code-kontor/slizaa/${project.artifactId}:${project.version}</filter>
                                     <pushRegistry>ghcr.io</pushRegistry>
+                                    <skipTag>true</skipTag>
                                 </configuration>
                             </execution>
                         </executions>

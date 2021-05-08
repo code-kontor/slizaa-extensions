@@ -131,21 +131,22 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>io.fabric8</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.33.0</version>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>3.0.0</version>
                         <executions>
                             <execution>
-                                <id>push-docker-image</id>
                                 <phase>deploy</phase>
-                                <goals>
-                                    <goal>push</goal>
-                                </goals>
                                 <configuration>
-                                    <filter>docker.pkg.github.com/code-kontor/slizaa/${project.artifactId}:${project.version}</filter>
-                                    <pushRegistry>docker.pkg.github.com</pushRegistry>
-                                    <skipTag>true</skipTag>
+                                    <target>
+                                        <echo>Push to registry...</echo>
+                                        <exec executable="docker">
+                                            <arg line="login docker.pkg.github.com -u test -p test"/>
+                                        </exec>
+                                    </target>
                                 </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
                             </execution>
                         </executions>
                     </plugin>

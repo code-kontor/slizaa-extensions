@@ -103,7 +103,7 @@
                                 <configuration>
                                     <images>
                                         <image>
-                                            <name>io.codekontor/slizaa/${project.artifactId}:${project.version}</name>
+                                            <name>code-kontor/slizaa/${project.artifactId}:${project.version}</name>
                                             <build>
                                                 <contextDir>${project.basedir}</contextDir>
                                                 <args>
@@ -115,6 +115,35 @@
                                             </build>
                                         </image>
                                     </images>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>dockerPush</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.fabric8</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <version>0.33.0</version>
+                        <executions>
+                            <execution>
+                                <id>push-docker-image</id>
+                                <phase>deploy</phase>
+                                <goals>
+                                    <goal>push</goal>
+                                </goals>
+                                <configuration>
+                                    <filter>code-kontor/slizaa/${project.artifactId}:${project.version}</filter>
+                                    <pushRegistry>ghcr.io</pushRegistry>
                                 </configuration>
                             </execution>
                         </executions>
